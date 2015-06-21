@@ -1,0 +1,25 @@
+{
+  "plugins": {
+    "metalsmith-drafts": {},
+
+    "metalsmith-collections": {},
+
+    "metalsmith-define": {
+      "google-analytics": "UA-58596861-1"
+    },
+
+    "metalsmith-metallic": {},
+
+    "metalsmith-markdown": {},
+
+    "metalsmith-typography": {},
+
+    "metalsmith-templates": {
+      "engine": "handlebars"
+    },
+
+    "metalsmith-html-minifier": {},
+
+    "./plugins/postcss": {}
+  }
+}

@@ -1,0 +1,363 @@
+/* Variables */
+
+:root {
+  --dark-gray-color: #c0c0c0ff;
+  --gray-color: #efefefff;
+  --blue-color: #0074d9ff;
+}
+
+/* Mixins */
+
+@define-mixin serif {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+}
+
+@define-mixin sans-serif {
+  font-family: 'PT Sans', sans-serif;
+  font-weight: 400;
+}
+
+@define-mixin monospace {
+  font-family: Inconsolata, monospace;
+  font-weight: 400;
+}
+
+@define-mixin bold {
+  font-weight: 700;
+}
+
+@define-mixin url {
+  color: var(--blue-color);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Globals */
+
+html {
+  height: 100%;
+}
+
+p {
+  margin: 1rem 0;
+}
+
+/* MainPage */
+
+.MainPage {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  align-content: stretch;
+}
+
+.MainPage-Name, .MainPage-Menu, .MainPage-Contacts {
+  flex: 1 100%;
+}
+
+.MainPage-Name {
+  @mixin serif;
+
+  margin: 0;
+  font-size: 5rem;
+  text-align: center;
+}
+
+.MainPage-Position {
+  @mixin serif;
+
+  margin: 0;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.MainPage-Menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.MainPage-Menu-Item {
+  flex: 1 100%;
+  @mixin serif;
+
+  margin: 10px 0;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.MainPage-Link {
+  @mixin serif;
+  @mixin url;
+}
+
+.MainPage-Contacts {
+  text-align: center;
+}
+
+.MainPage-ContactsLink {
+  @mixin serif;
+  @mixin url;
+}
+
+/* ResumePage */
+
+.ResumePage {
+  background: var(--gray-color);
+}
+
+.Resume {
+  @mixin sans-serif;
+  font-size: .9rem;
+  margin: 50px auto;
+  width: 800px;
+  background: white;
+  border: 1px solid var(--dark-gray-color);
+}
+
+.Resume-Content {
+  margin: 30px;
+}
+
+.Resume-Header {
+  margin: 30px 0;
+  text-align: center;
+}
+
+.Resume-Name {
+  @mixin serif;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.Resume-Position {
+  @mixin serif;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.Resume-Summary {
+  margin: 30px 110px;
+  color: #707070;
+}
+
+.Resume-Block {
+  display: flex;
+  margin: 30px 0;
+}
+
+.Resume-Block-Header {
+  width: 30%;
+  padding-right: 15px;
+  text-align: center;
+  border-right: 1px solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.Resume-Block-Title {
+  @mixin serif;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.Resume-Block-Content {
+  padding-left: 30px;
+  width: 70%;
+  box-sizing: border-box;
+}
+
+.ResumePoint {
+  display: flex;
+  margin: 10px 0;
+}
+
+.ResumePoint-Title {
+  @mixin bold;
+  width: 100px;
+}
+
+.ResumeLink {
+  @mixin url;
+}
+
+.ResumeProfile {
+  display: inline-block;
+  margin: 10px 20px 10px 0;
+}
+
+.Resume-Block-TimelineHeader {
+  margin-bottom: 0;
+}
+
+.Resume-Block-TimelinePoint {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.Resume-Block-TimelinePointFirst {
+  margin-top: 0;
+}
+
+.Resume-Block-TimelinePointLast {
+  margin-top: 0;
+}
+
+.ResumeDateRange {
+  @mixin serif;
+  font-size: .9em;
+  margin: 1rem 0;
+}
+
+.ResumeDateRange-Date {
+  @mixin bold;
+}
+
+.ResumeSkillsListTitle {
+  margin-bottom: .5rem;
+}
+
+.ResumeSkillsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ResumeSkillsList-Item {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.ResumeSkillsList-Item:after {
+  content: ',';
+}
+
+.ResumeSkillsList-Item:last-child:after {
+  content: '.';
+}
+
+/* PostsPage */
+
+.PostsPage {
+}
+
+.PostsPage-Menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.PostsPage-Menu-Item {
+  width: 800px;
+  @mixin serif;
+  margin: 30px auto;
+  font-size: 2rem;
+}
+
+.PostsPage-Link {
+  font-size: 3rem;
+  @mixin serif;
+  @mixin url;
+}
+
+.PostsPage-Menu-Item-Date {
+  white-space: nowrap;
+}
+
+/* Header */
+
+.Header {
+  display: flex;
+  margin: 30px;
+  margin-bottom: 50px;
+  align-items: center;
+}
+
+.Header-Menu {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.Header-Name {
+  @mixin serif;
+  @mixin url;
+  font-size: 2rem;
+  margin-right: 50px;
+}
+
+.Header-Menu-Item {
+  margin-right: 15px;
+}
+
+.Header-Link {
+  @mixin serif;
+  @mixin url;
+  font-size: 1.25rem;
+}
+
+.Header-CurrentPage {
+  @mixin serif;
+  font-size: 1.25rem;
+}
+
+/* Post */
+
+.Post {
+  width: 800px;
+  @mixin sans-serif;
+  margin: 30px auto;
+}
+
+.Post-Header {
+  margin-bottom: 70px;
+}
+
+.Post-Title {
+  @mixin serif;
+  margin: 0;
+  font-size: 3rem;
+}
+
+.Post-Date {
+  @mixin serif;
+  font-size: 2rem;
+}
+
+.Post-Note {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.Post-Content {
+  font-size: 1.3rem;
+}
+
+.Post-Content a {
+  @mixin url;
+}
+
+.Post-Content hr {
+  border: none;
+  border-bottom: 1px solid var(--dark-gray-color);
+  width: 100px;
+  margin: 3rem auto;
+}
+
+.Post-Content .hljs {
+  @mixin monospace;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  box-sizing: border-box;
+  overflow-x: scroll;
+}

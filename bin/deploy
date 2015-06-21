@@ -1,0 +1,17 @@
+#!/bin/bash
+
+npm run build
+
+if [ ! -d repo ]; then
+  git clone git@github.com:vslinko-personal/vslinko-personal.github.io.git repo
+fi
+
+cd repo
+git pull
+
+rm -rf *
+cp -r ../build/* .
+
+git add .
+git commit -m Update
+git push

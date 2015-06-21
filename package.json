@@ -1,0 +1,30 @@
+{
+  "name": "vslinko.com",
+  "version": "1.0.0",
+  "dependencies": {
+    "autoprefixer": "5.2.0",
+    "cssnano": "1.4.3",
+    "cssnext": "1.7.0",
+    "handlebars": "3.0.3",
+    "metalsmith": "1.7.0",
+    "metalsmith-collections": "0.7.0",
+    "metalsmith-define": "1.0.0",
+    "metalsmith-drafts": "0.0.1",
+    "metalsmith-html-minifier": "1.1.0",
+    "metalsmith-markdown": "0.2.1",
+    "metalsmith-metallic": "0.3.1",
+    "metalsmith-serve": "0.0.3",
+    "metalsmith-templates": "0.7.0",
+    "metalsmith-typography": "0.1.1",
+    "metalsmith-watch": "1.0.1",
+    "pixrem": "1.2.4",
+    "postcss": "4.1.11",
+    "postcss-mixins": "0.3.0",
+    "postcss-nested": "0.3.2"
+  },
+  "scripts": {
+    "build": "metalsmith",
+    "start": "node server.js"
+  },
+  "private": true
+}

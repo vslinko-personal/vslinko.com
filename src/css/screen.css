@@ -347,6 +347,12 @@ p {
   @mixin url;
 }
 
+.Post-Content blockquote {
+  margin: 2rem;
+  font-size: 2rem;
+  font-style: italic;
+}
+
 .Post-Content hr {
   border: none;
   border-bottom: 1px solid var(--dark-gray-color);

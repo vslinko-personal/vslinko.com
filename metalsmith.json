@@ -2,7 +2,13 @@
   "plugins": {
     "metalsmith-drafts": {},
 
-    "metalsmith-collections": {},
+    "metalsmith-collections": {
+      "posts": {
+        "pattern": "posts/*.md",
+        "sortBy": "date",
+        "reverse": true
+      }
+    },
 
     "metalsmith-define": {
       "google-analytics": "UA-58596861-1"

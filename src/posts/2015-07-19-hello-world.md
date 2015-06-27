@@ -1,7 +1,7 @@
 ---
 title: Hello World!
-date: 19 June 2015
-collection: posts
+date: 2015-07-19
+formatted_date: 19 June 2015
 path: /posts/2015-07-19-hello-world.html
 template: post.html
 ---

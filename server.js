@@ -1,28 +1,17 @@
-var metalsmith = require('metalsmith')
-var serve = require('metalsmith-serve')
-var watch = require('metalsmith-watch')
+const express = require("express");
+const { build, watch } = require("./build");
 
-var config = require('./metalsmith.json')
+async function main() {
+  await build();
 
-var build = metalsmith(__dirname)
+  const app = express();
 
-Object.keys(config.plugins).forEach(function(pluginName) {
-  var plugin = require(pluginName)
+  app.use(express.static("dist"));
 
-  build.use(plugin(config.plugins[pluginName]))
-})
+  app.listen(3000, "0.0.0.0", () => {
+    console.log("Listening 0.0.0.0:3000");
+    watch();
+  });
+}
 
-build.use(serve())
-build.use(watch({
-  paths: {
-    "${source}/**/*": "**/*",
-    "public/**/*": true,
-    "templates/**/*": "**/*"
-  }
-}))
-
-build.build(function(error) {
-  if (error) {
-    throw error
-  }
-})
+main();

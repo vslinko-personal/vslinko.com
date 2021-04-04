@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="page" lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{{title}}} — Blog — Vyacheslav Slinko's website</title>
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/screen.css" />
+  </head>
+  <body class="page__body">
+    <article class="article h-entry">
+      <h1 class="article__header p-name">{{{title}}}</h1>
+      <section class="article__content e-content">{{{content}}}</section>
+      <footer class="article__footer">
+        <time class="dt-published" datetime="{{date}}">{{dateFormatted}}</time
+        ><br />
+        <a href="/" class="article__author p-author h-card"
+          >Viacheslav Slinko</a
+        >
+      </footer>
+    </article>
+
+    <footer class="footer">
+      <ul class="contacts">
+        <li class="contacts__item">
+          <a class="contacts__link" href="/">Home</a>
+        </li>
+        <li class="contacts__item">
+          <a class="contacts__link" href="/posts/">Blog</a>
+        </li>
+        {{{links}}}
+      </ul>
+    </footer>
+
+    {{{ym}}}
+  </body>
+</html>

@@ -175,3 +175,7 @@ a.article__author:hover,
 a.article__author:focus {
   color: #004040;
 }
+
+#disqus_thread {
+  margin: 60px 20px;
+}

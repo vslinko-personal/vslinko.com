@@ -28,7 +28,6 @@ function minifyHTML(content) {
     removeAttributeQuotes: true,
     removeComments: true,
     removeEmptyAttributes: true,
-    removeEmptyElements: true,
     removeOptionalTags: true,
     removeRedundantAttributes: true,
     useShortDoctype: true,
@@ -121,6 +120,7 @@ async function parsePosts() {
         src,
         dist,
         url: `/posts/${date}-${slug}.html`,
+        canonicalUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
         date,
         content,
       });

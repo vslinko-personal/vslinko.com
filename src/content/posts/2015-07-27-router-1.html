@@ -15,11 +15,13 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   I&nbsp;won&#39;t describe the functional paradigm in depth, but I&#39;ll use
   its principles.. If&nbsp;you want to&nbsp;read about functional programming
   then you could read the article,
-  <a href="http://www.defmacro.org/ramblings/fp.html"
+  <a href="http://www.defmacro.org/ramblings/fp.html" rel="noopener"
     >Functional Programming For The Rest of&nbsp;Us</a
   >
   and watch the slides,
-  <a href="http://scott.sauyet.com/Javascript/Talk/FunctionalProgramming/"
+  <a
+    href="http://scott.sauyet.com/Javascript/Talk/FunctionalProgramming/"
+    rel="noopener"
     >Functional Programming</a
   >.
 </p>
@@ -65,8 +67,12 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
 </p>
 <p>
   I&#39;ll use the awesome static type checker,
-  <a href="http://flowtype.org/">Flow</a>, and all of&nbsp;the new ECMAScript
-  features available in&nbsp;<a href="https://babeljs.io/">Babel</a>.
+  <a href="http://flowtype.org/" rel="noopener">Flow</a>, and all of&nbsp;the
+  new ECMAScript features available in&nbsp;<a
+    href="https://babeljs.io/"
+    rel="noopener"
+    >Babel</a
+  >.
 </p>
 
 <h2>Part 1&nbsp;&mdash; Definitions</h2>
@@ -95,9 +101,9 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   screen changes and can be&nbsp;notified about URL changes. It&#39;s very
   similar to&nbsp;<em>Observable</em> behavior that is&nbsp;implemented
   in&nbsp;the
-  <a href="https://github.com/Reactive-Extensions/RxJS">RxJS</a> library,
-  but&nbsp;I don&#39;t want complicate my&nbsp;router, so&nbsp;I just define
-  a&nbsp;simple subscribe API.
+  <a href="https://github.com/Reactive-Extensions/RxJS" rel="noopener">RxJS</a>
+  library, but&nbsp;I don&#39;t want complicate my&nbsp;router, so&nbsp;I just
+  define a&nbsp;simple subscribe API.
 </p>
 <pre><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Listener</span>&lt;<span class="hljs-type">T</span>&gt; = (value: ?<span class="hljs-type">T</span>) =&gt; void
 <span class="hljs-keyword">type</span> <span class="hljs-type">Subscriber</span>&lt;<span class="hljs-type">T</span>&gt; = (listener: <span class="hljs-type">Listener</span>&lt;<span class="hljs-type">T</span>&gt;) =&gt; <span class="hljs-type">Unsubscriber</span>

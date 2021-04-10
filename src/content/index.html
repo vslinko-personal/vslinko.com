@@ -19,6 +19,34 @@
       {{{links}}}
     </ul>
 
+    <img class="bg" data-src="/media/john-fowler-7Ym9rpYtSdA-unsplash.jpg" />
+
+    <script>
+      (async () => {
+        const loadImage = () => {
+          return new Promise((resolve) => {
+            const image = document.querySelector(".bg");
+            image.src = image.dataset.src;
+            image.onload = () => {
+              resolve();
+            };
+          });
+        };
+
+        const wait = (t) => new Promise((resolve) => setTimeout(resolve, t));
+
+        await Promise.all([loadImage(), wait(500)]);
+
+        document.querySelector(".bg").classList.add("bg-img_loaded");
+        document
+          .querySelector(".mainpage_header")
+          .classList.add("mainpage_header-img_loaded");
+        document
+          .querySelector(".contacts")
+          .classList.add("contacts-img_loaded");
+      })();
+    </script>
+
     {{{ym}}}
   </body>
 </html>

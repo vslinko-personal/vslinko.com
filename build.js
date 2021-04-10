@@ -145,12 +145,14 @@ async function buildCommand() {
   await mkdir("dist/css");
   await mkdir("dist/posts");
   await mkdir("dist/resume");
+  await mkdir("dist/media");
 
   await copy("CNAME");
   await copy("css/normalize.css");
   await copy("css/hljs.css");
   await processCSS("css/screen.css");
   await copy("resume/developer.html");
+  await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.jpg");
   await processHTML("resume/manager.html", {
     ym: templates.ym,
   });

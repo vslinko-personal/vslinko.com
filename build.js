@@ -152,7 +152,7 @@ async function buildCommand() {
   await copy("css/hljs.css");
   await processCSS("css/screen.css");
   await copy("resume/developer.html");
-  await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.jpg");
+  await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.webp");
   await processHTML("resume/manager.html", {
     ym: templates.ym,
   });

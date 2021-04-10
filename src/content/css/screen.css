@@ -2,6 +2,12 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   height: 100%;
+  background-color: white;
+}
+
+.page-img_loaded {
+  background-color: black;
+  transition: background-color 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }
 
 .page__body {
@@ -100,7 +106,8 @@ a.contacts__link:focus {
   transition: color 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }
 
-.contacts-img_loaded .contacts__link:hover, .contacts-img_loaded .contacts__link:focus {
+.contacts-img_loaded .contacts__link:hover,
+.contacts-img_loaded .contacts__link:focus {
   color: #eeeeee;
   transition: color 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }

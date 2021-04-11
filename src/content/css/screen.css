@@ -89,11 +89,22 @@ html {
 
 .mainpage_header {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin: 20px;
+}
+
+.mainpage_header__name {
   font-size: 4rem;
   font-weight: 100;
-  margin: 20px;
+  margin: 0;
+}
+
+.mainpage_header__title {
+  font-size: 1rem;
+  font-weight: 100;
+  margin: 0;
 }
 
 .mainpage_header-img_loaded {
@@ -111,13 +122,13 @@ html {
 }
 
 @media (max-width: 600px) {
-  .mainpage_header {
+  .mainpage_header__name {
     font-size: 3rem;
   }
 }
 
 @media (max-width: 400px) {
-  .mainpage_header {
+  .mainpage_header__name {
     font-size: 2rem;
   }
 }

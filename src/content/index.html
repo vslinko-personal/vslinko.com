@@ -11,7 +11,9 @@
   <body class="page__body h-card">
     <header class="mainpage_header">
       <h1 class="mainpage_header__name p-name">Viacheslav Slinko</h1>
-      <p class="mainpage_header__title p-job-title">Software Engineering Manager</p>
+      <p class="mainpage_header__title p-job-title">
+        Software Engineering Manager
+      </p>
     </header>
 
     <ul class="contacts contacts-pos_center">
@@ -25,29 +27,58 @@
     <img class="bg" data-src="/media/john-fowler-7Ym9rpYtSdA-unsplash.webp" />
 
     <script>
-      (async () => {
-        const loadImage = () => {
+      (() => {
+        const loadImage = (image) => {
           return new Promise((resolve) => {
-            const image = document.querySelector(".bg");
-            image.src = image.dataset.src;
-            image.onload = () => {
+            if (image.complete) {
               resolve();
-            };
+            } else {
+              image.onload = () => {
+                resolve();
+              };
+            }
           });
+        };
+
+        const loaded = (animate) => {
+          document.querySelector(".page").classList.add("page-img_loaded");
+          document.querySelector(".bg").classList.add("bg-img_loaded");
+          document
+            .querySelector(".mainpage_header")
+            .classList.add("mainpage_header-img_loaded");
+          document
+            .querySelector(".contacts")
+            .classList.add("contacts-img_loaded");
+          if (animate) {
+            document
+              .querySelector(".page")
+              .classList.add("page-img_loaded_anim");
+            document.querySelector(".bg").classList.add("bg-img_loaded_anim");
+            document
+              .querySelector(".mainpage_header")
+              .classList.add("mainpage_header-img_loaded_anim");
+            document
+              .querySelector(".contacts")
+              .classList.add("contacts-img_loaded_anim");
+          }
         };
 
         const wait = (t) => new Promise((resolve) => setTimeout(resolve, t));
 
-        await Promise.all([loadImage(), wait(500)]);
+        const image = document.querySelector(".bg");
+        image.src = image.dataset.src;
 
-        document.querySelector(".page").classList.add("page-img_loaded");
-        document.querySelector(".bg").classList.add("bg-img_loaded");
-        document
-          .querySelector(".mainpage_header")
-          .classList.add("mainpage_header-img_loaded");
-        document
-          .querySelector(".contacts")
-          .classList.add("contacts-img_loaded");
+        const imageLoaded = image.complete;
+        const motionReduced = window.matchMedia
+          ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          : false;
+
+        if (imageLoaded || motionReduced) {
+          loaded(false);
+          return;
+        }
+
+        Promise.all([loadImage(image), wait(500)]).then(() => loaded(true));
       })();
     </script>
 

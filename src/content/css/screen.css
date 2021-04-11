@@ -39,6 +39,9 @@ html {
 
 .page-img_loaded {
   background-color: var(--bg-color-dark);
+}
+
+.page-img_loaded_anim {
   animation: page-img_loaded 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }
 
@@ -75,6 +78,8 @@ html {
 
 .bg-img_loaded {
   opacity: 1;
+}
+.bg-img_loaded_anim {
   animation: bg-img_loaded 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }
 
@@ -109,6 +114,8 @@ html {
 
 .mainpage_header-img_loaded {
   color: var(--text-color-inv);
+}
+.mainpage_header-img_loaded_anim {
   animation: mainpage_header-img_loaded 700ms cubic-bezier(0.85, 0, 0.15, 1);
 }
 
@@ -159,6 +166,8 @@ html {
 
 .contacts-img_loaded .contacts__item {
   color: var(--text-color-inv);
+}
+.contacts-img_loaded_anim .contacts__item {
   animation: contacts-img_loaded__contacts__item 700ms
     cubic-bezier(0.85, 0, 0.15, 1);
 }
@@ -183,6 +192,9 @@ a.contacts__link:focus {
 
 .contacts-img_loaded a.contacts__link {
   color: var(--link-color-mainpage);
+}
+
+.contacts-img_loaded_anim a.contacts__link {
   animation: contacts-img_loaded__contacts__link 700ms
     cubic-bezier(0.85, 0, 0.15, 1);
 }

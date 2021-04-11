@@ -5,6 +5,7 @@ const {
   readFile,
   writeFile,
   readdir,
+  stat,
 } = require("fs/promises");
 const { promisify } = require("util");
 const path = require("path");
@@ -42,6 +43,16 @@ async function processHTML(file, context) {
 
   const template = await readFile(src, "utf-8");
   const result = minifyHTML(render(template, context));
+
+  await writeFile(dist, result);
+}
+
+async function processXML(file, context) {
+  const src = path.join("src", "content", file);
+  const dist = path.join("dist", file);
+
+  const template = await readFile(src, "utf-8");
+  const result = render(template, context);
 
   await writeFile(dist, result);
 }
@@ -111,6 +122,7 @@ async function parsePosts() {
 
       const fileContent = await readFile(src, "utf-8");
       const { meta, content } = parseMeta(fileContent);
+      const { mtime } = await stat(src);
 
       const date = matches[1];
       const slug = matches[2];
@@ -119,6 +131,7 @@ async function parsePosts() {
         ...meta,
         src,
         dist,
+        mtime,
         url: `/posts/${date}-${slug}.html`,
         canonicalUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
         date,
@@ -148,7 +161,8 @@ async function buildCommand() {
   await mkdir("dist/media");
 
   await copy("CNAME");
-  await copy("css/normalize.css");;
+  await copy("robots.txt");
+  await copy("css/normalize.css");
   await copy("css/a11y-dark.min.css");
   await copy("css/a11y-light.min.css");
   await processCSS("css/screen.css");
@@ -173,6 +187,45 @@ async function buildCommand() {
   await processHTML("index.html", {
     ym: templates.ym,
     links: templates.links,
+  });
+
+  const urls = posts.map((p) => {
+    return {
+      loc: `https://vslinko.com${p.url}`,
+      lastmod: p.mtime.toISOString(),
+      changefreq: "monthly",
+    };
+  });
+
+  const maxPostLastmod = posts.reduce((acc, post) => {
+    if (acc === null) {
+      return post.mtime;
+    }
+    if (post.mtime > acc) {
+      return post.mtime;
+    }
+    return acc;
+  }, null);
+  const postsIndexLastmod = (await stat("src/content/posts/index.html")).mtime;
+  const postsLastmod =
+    postsIndexLastmod > maxPostLastmod ? postsIndexLastmod : maxPostLastmod;
+
+  urls.unshift({
+    loc: "https://vslinko.com/posts/",
+    lastmod: postsLastmod.toISOString(),
+    changefreq: "daily",
+  });
+
+  const indexLastmod = (await stat("src/content/index.html")).mtime;
+
+  urls.unshift({
+    loc: "https://vslinko.com/",
+    lastmod: indexLastmod.toISOString(),
+    changefreq: "monthly",
+  });
+
+  await processXML("sitemap.xml", {
+    urls,
   });
 }
 

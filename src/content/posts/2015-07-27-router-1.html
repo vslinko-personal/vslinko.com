@@ -5,7 +5,16 @@ dateFormatted: Jun 27th, 2015
 summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp;simple isomorphic router using functional paradigm principles.
 ---
 
-<link rel="stylesheet" href="/css/hljs.css" />
+<link
+  rel="stylesheet"
+  href="/css/a11y-dark.min.css"
+  media="(prefers-color-scheme: dark)"
+/>
+<link
+  rel="stylesheet"
+  href="/css/a11y-light.min.css"
+  media="(prefers-color-scheme: light)"
+/>
 
 <p>
   Recently, the functional paradigm has become more popular in&nbsp;the frontend
@@ -86,14 +95,18 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   can&#39;t return a&nbsp;new screen if&nbsp;the URL isn&#39;t valid
   for&nbsp;it.
 </p>
-<pre><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Transition</span> = (url: <span class="hljs-type">Url</span>) =&gt; <span class="hljs-type">Promise</span>&lt;?<span class="hljs-type">Screen</span>&gt;
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Transition</span> = (url: <span class="hljs-type">Url</span>) =&gt; <span class="hljs-type">Promise</span>&lt;?<span class="hljs-type">Screen</span>&gt;
 </code></pre>
 <p>
   The URL is&nbsp;just a&nbsp;string, but what is&nbsp;a&nbsp;screen?
   I&nbsp;don&#39;t want to&nbsp;depend on&nbsp;any framework or&nbsp;template
   engine so&nbsp;in&nbsp;my&nbsp;case, a&nbsp;screen could be&nbsp;any object.
 </p>
-<pre><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Url </span>= string
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Url </span>= string
 <span class="hljs-keyword">type</span> <span class="hljs-type">Screen </span>= Object
 </code></pre>
 <p>
@@ -105,7 +118,9 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   library, but&nbsp;I don&#39;t want complicate my&nbsp;router, so&nbsp;I just
   define a&nbsp;simple subscribe API.
 </p>
-<pre><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Listener</span>&lt;<span class="hljs-type">T</span>&gt; = (value: ?<span class="hljs-type">T</span>) =&gt; void
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">Listener</span>&lt;<span class="hljs-type">T</span>&gt; = (value: ?<span class="hljs-type">T</span>) =&gt; void
 <span class="hljs-keyword">type</span> <span class="hljs-type">Subscriber</span>&lt;<span class="hljs-type">T</span>&gt; = (listener: <span class="hljs-type">Listener</span>&lt;<span class="hljs-type">T</span>&gt;) =&gt; <span class="hljs-type">Unsubscriber</span>
 <span class="hljs-keyword">type</span> <span class="hljs-type">Unsubscriber</span> = () =&gt; void
 
@@ -126,7 +141,9 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   router should have knowledge about all application transitions. The router
   constructor solves that problems.
 </p>
-<pre><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">RouterCreator</span> = (transition: <span class="hljs-type">Transition</span>) =&gt; <span class="hljs-type">Router</span>
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">type</span> <span class="hljs-type">RouterCreator</span> = (transition: <span class="hljs-type">Transition</span>) =&gt; <span class="hljs-type">Router</span>
 </code></pre>
 <p>
   You could see that this constructor receives only one transition function. But
@@ -167,7 +184,9 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   This part will contain more code than words. I&#39;ll start with two
   transition functions for two screens.
 </p>
-<pre><code class="lang-js">type QueryParameters = {[<span class="hljs-attribute">key</span>: <span class="hljs-built_in">string</span>]: <span class="hljs-built_in">string</span>}
+<pre
+  class="hljs"
+><code class="lang-js">type QueryParameters = {[<span class="hljs-attribute">key</span>: <span class="hljs-built_in">string</span>]: <span class="hljs-built_in">string</span>}
 
 <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">indexTransition</span>(<span class="hljs-params">url: Url</span>): <span class="hljs-title">Promise</span>&lt;?<span class="hljs-title">Screen</span>&gt; </span>{
   <span class="hljs-keyword">if</span> (<span class="hljs-built_in">url</span> !== <span class="hljs-string">'/'</span>) {
@@ -202,7 +221,9 @@ summary: In&nbsp;this article I&#39;ll try to&nbsp;describe and implement a&nbsp
   Using these properties of&nbsp;JavaScript, I&nbsp;can write another function
   that will create transitions for&nbsp;me.
 </p>
-<pre><code class="lang-js">type TransitionHandler = <span class="hljs-function">(<span class="hljs-params">queryParameters: QueryParameters</span>) =&gt;</span> <span class="hljs-built_in">Promise</span>&lt;Screen&gt;
+<pre
+  class="hljs"
+><code class="lang-js">type TransitionHandler = <span class="hljs-function">(<span class="hljs-params">queryParameters: QueryParameters</span>) =&gt;</span> <span class="hljs-built_in">Promise</span>&lt;Screen&gt;
 
 type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">pattern: string, handler: TransitionHandler</span>) =&gt;</span> Transition
 
@@ -217,7 +238,9 @@ type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">
 }
 </code></pre>
 <p>Now the transitions have become simpler.</p>
-<pre><code class="lang-js"><span class="hljs-keyword">const</span> indexTransition: Transition = createTransition(<span class="hljs-string">'/'</span>,
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">const</span> indexTransition: Transition = createTransition(<span class="hljs-string">'/'</span>,
   <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">queryParameters: QueryParameters</span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">Screen</span>&gt; </span>{
     <span class="hljs-keyword">return</span> {
       <span class="hljs-attr">component</span>: <span class="hljs-string">'IndexPage'</span>,
@@ -241,7 +264,9 @@ type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">
   several transitions into a&nbsp;single transition that will in&nbsp;turn
   invoke them in&nbsp;series.
 </p>
-<pre><code class="lang-js">type TransitionsCombinator = <span class="hljs-function">(<span class="hljs-params">...transitions: <span class="hljs-built_in">Array</span>&lt;Transition&gt;</span>) =&gt;</span> Transition
+<pre
+  class="hljs"
+><code class="lang-js">type TransitionsCombinator = <span class="hljs-function">(<span class="hljs-params">...transitions: <span class="hljs-built_in">Array</span>&lt;Transition&gt;</span>) =&gt;</span> Transition
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">combineTransitions</span>(<span class="hljs-params">...transitions: Array&lt;Transition&gt;</span>): <span class="hljs-title">Transition</span> </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">combinedTransition</span>(<span class="hljs-params">url: Url</span>): <span class="hljs-title">Promise</span>&lt;?<span class="hljs-title">Screen</span>&gt; </span>{
@@ -265,7 +290,9 @@ type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">
 <p>
   I&#39;ll add one more transition for the screen of&nbsp;the 404&nbsp;page.
 </p>
-<pre><code class="lang-js"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">notFoundTransition</span>(<span class="hljs-params">url: Url</span>): <span class="hljs-title">Promise</span>&lt;?<span class="hljs-title">Screen</span>&gt; </span>{
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">notFoundTransition</span>(<span class="hljs-params">url: Url</span>): <span class="hljs-title">Promise</span>&lt;?<span class="hljs-title">Screen</span>&gt; </span>{
   <span class="hljs-keyword">return</span> {<span class="hljs-attr">component</span>: <span class="hljs-string">'NotFoundPage'</span>, <span class="hljs-attr">props</span>: {}}
 }
 
@@ -280,7 +307,9 @@ type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">
   so&nbsp;as&nbsp;to&nbsp;catch an&nbsp;error that&nbsp;I can use in&nbsp;the
   screen of&nbsp;the error page.
 </p>
-<pre><code class="lang-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createErrorTransition</span>(<span class="hljs-params">transition: Transition</span>): <span class="hljs-title">Transition</span> </span>{
+<pre
+  class="hljs"
+><code class="lang-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createErrorTransition</span>(<span class="hljs-params">transition: Transition</span>): <span class="hljs-title">Transition</span> </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">errorTransition</span>(<span class="hljs-params">url: Url</span>): <span class="hljs-title">Promise</span>&lt;?<span class="hljs-title">Screen</span>&gt; </span>{
     <span class="hljs-keyword">try</span> {
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> transition(url)
@@ -305,7 +334,9 @@ type TransitionCreator = <span class="hljs-function">(<span class="hljs-params">
   I&#39;ll play a&nbsp;little bit more. Most routers have the ability
   to&nbsp;wrap a&nbsp;group of transitions with some prefix.
 </p>
-<pre><code class="lang-js">type PrefixTransition = <span class="hljs-function">(<span class="hljs-params">prefix: Url, transition: Transition</span>) =&gt;</span> Transition
+<pre
+  class="hljs"
+><code class="lang-js">type PrefixTransition = <span class="hljs-function">(<span class="hljs-params">prefix: Url, transition: Transition</span>) =&gt;</span> Transition
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prefixTransition</span>(<span class="hljs-params">prefix: Url, transition: Transition</span>): <span class="hljs-title">Transition</span> </span>{
   <span class="hljs-keyword">const</span> prefixRe: <span class="hljs-built_in">RegExp</span> = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">`^<span class="hljs-subst">${prefix}</span>`</span>)

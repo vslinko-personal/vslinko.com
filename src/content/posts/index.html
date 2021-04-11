@@ -1,29 +1,35 @@
 <!DOCTYPE html>
-<html class="page" lang="en">
+<html class="page" lang="en" itemscope itemtype="https://schema.org/Blog">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Blog — Viacheslav Slinko's website</title>
+    <title itemprop="name">Blog — Viacheslav Slinko's website</title>
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/screen.css" />
     <meta
       name="description"
+      itemprop="description"
       content="Personal blog of Viacheslav Slinko. I write about IT management, software development, personal development and anything else that interests me."
     />
   </head>
-  <body class="page__body h-feed">
-    <h1 class="header p-name">Blog</h1>
+  <body class="page__body">
+    <h1 class="header">Blog</h1>
 
     <main class="posts">
       {{#posts}}
-      <article class="post h-entry">
-        <time class="post__time dt-published" datetime="{{date}}"
+      <article
+        class="post"
+        itemprop="blogPost"
+        itemscope
+        itemtype="https://schema.org/BlogPosting"
+      >
+        <time class="post__time" itemprop="datePublished" datetime="{{date}}"
           >{{dateFormatted}}</time
         >
-        <h2 class="post__title p-name">
-          <a class="post__link u-url" href="{{url}}">{{{title}}}</a>
+        <h2 class="post__title" itemprop="headline">
+          <a class="post__link" href="{{url}}" itemprop="url">{{{title}}}</a>
         </h2>
-        <p class="post__summary p-summary">{{{summary}}}</p>
+        <p class="post__summary" itemprop="articleBody">{{{summary}}}</p>
       </article>
       {{/posts}}
     </main>

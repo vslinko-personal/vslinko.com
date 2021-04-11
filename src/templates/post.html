@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html class="page" lang="{{lang}}">
+<html
+  class="page"
+  lang="{{lang}}"
+  itemscope
+  itemtype="https://schema.org/BlogPosting"
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,14 +14,22 @@
     <meta name="description" content="{{{summary}}}" />
   </head>
   <body class="page__body">
-    <article class="article h-entry">
-      <h1 class="article__header p-name">{{{title}}}</h1>
-      <section class="article__content e-content">{{{content}}}</section>
+    <article class="article">
+      <h1 class="article__header" itemprop="headline">{{{title}}}</h1>
+      <section class="article__content" itemprop="articleBody">
+        {{{content}}}
+      </section>
       <footer class="article__footer">
-        <time class="dt-published" datetime="{{date}}">{{dateFormatted}}</time
+        <time itemprop="datePublished" datetime="{{date}}"
+          >{{dateFormatted}}</time
         ><br />
-        <a href="/" class="article__author p-author h-card"
-          >Viacheslav Slinko</a
+        <a
+          href="/"
+          class="article__author"
+          itemprop="author"
+          itemscope
+          itemtype="https://schema.org/Person"
+          ><span itemprop="name">Viacheslav Slinko</span></a
         >
       </footer>
     </article>

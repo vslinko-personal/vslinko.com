@@ -224,6 +224,14 @@ async function buildCommand() {
     changefreq: "monthly",
   });
 
+  const resumeLastmod = (await stat("src/content/resume/manager.html")).mtime;
+
+  urls.push({
+    loc: "https://vslinko.com/resume/manager.html",
+    lastmod: resumeLastmod.toISOString(),
+    changefreq: "monthly",
+  });
+
   await processXML("sitemap.xml", {
     urls,
   });

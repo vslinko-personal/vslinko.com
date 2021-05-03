@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html class="page" lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{{title}}} — Garden — Viacheslav Slinko's website</title>
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/screen.css" />
+    <meta name="description" content="{{{summary}}}" />
+  </head>
+  <body class="page__body">
+    <article class="article">
+      <h1 class="article__header">{{{title}}}</h1>
+      <section class="article__content">{{{content}}}</section>
+      {{{backlinks}}}
+    </article>
+
+    <div class="disqus" id="disqus_thread"></div>
+    <script>
+      var disqus_config = function () {
+        this.page.url = "{{{canonicalUrl}}}";
+      };
+      (function () {
+        // DON'T EDIT BELOW THIS LINE
+        var d = document,
+          s = d.createElement("script");
+        s.src = "https://vslinko-com.disqus.com/embed.js";
+        s.setAttribute("data-timestamp", +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+
+    <footer class="footer">
+      <ul class="contacts">
+        <li class="contacts__item">
+          <a class="contacts__link" href="/">Home</a>
+        </li>
+        <li class="contacts__item">
+          <a class="contacts__link" href="/posts/">Blog</a>
+        </li>
+        {{{links}}}
+      </ul>
+    </footer>
+
+    {{{ym}}}
+  </body>
+</html>

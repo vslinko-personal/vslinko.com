@@ -5,8 +5,12 @@ html {
 
   --link-color: #03a9f4;
   --link-color-active: #01618d;
+  --link-color-without-url: #5dcbfd;
 
   --border-color: #d3d3d3;
+
+  --backlinks-background: #eeeeee;
+  --backlinks-color: var(--text-color);
 
   --blockquote-border-color: #808080;
   --blockquote-color: #404040;
@@ -24,8 +28,12 @@ html {
     --text-color: var(--text-color-inv);
     --headings-color: #f0f0f0;
     --link-color-active: #5dcbfd;
+    --link-color-without-url: #01618d;
     --border-color: #606060;
     --blockquote-color: #f0f0f0;
+
+    --backlinks-background: #333333;
+    --backlinks-color: var(--text-color-inv);
   }
 }
 
@@ -275,10 +283,6 @@ a.post__link:focus {
   line-height: 1.5;
 }
 
-.article__content a {
-  color: var(--link-color);
-}
-
 .article__content ul {
   padding-left: 20px;
 }
@@ -298,8 +302,21 @@ a.post__link:focus {
   font-size: 1.2em;
 }
 
-.article__content a:hover,
-.article__content a:focus {
+.article__content li > p {
+  margin: 0;
+}
+
+.article__content a {
+  color: var(--link-color-without-url);
+  text-decoration: underline;
+}
+
+.article__content a[href] {
+  color: var(--link-color);
+}
+
+.article__content a[href]:hover,
+.article__content a[href]:focus {
   color: var(--link-color-active);
 }
 
@@ -327,4 +344,27 @@ a.article__author:focus {
 .disqus {
   margin: 60px 20px;
   max-width: 800px;
+}
+
+.backlinks {
+  max-width: 800px;
+  margin: 40px 20px;
+  box-sizing: border-box;
+  background: var(--backlinks-background);
+  color: var(--backlinks-color);
+  padding: 10px 20px;
+}
+
+.backlinks__item {
+  margin: 10px 0;
+}
+
+a.backlinks__backlink {
+  color: var(--link-color);
+  line-height: 1.5;
+}
+
+a.backlinks__backlink:hover,
+a.backlinks__backlink:focus {
+  color: var(--link-color-active);
 }

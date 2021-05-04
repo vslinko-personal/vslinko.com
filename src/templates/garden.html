@@ -7,15 +7,38 @@
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/screen.css" />
     <meta name="description" content="{{{summary}}}" />
+    <script async src="/js/main.js"></script>
   </head>
-  <body class="page__body">
-    <article class="article">
-      <h1 class="article__header">{{{title}}}</h1>
-      <section class="article__content">{{{content}}}</section>
-      {{{backlinks}}}
-    </article>
+  <body class="page__body garden_layout">
+    <main class="garden_layout__main">
+      <article class="article">
+        <h1 class="article__header" id="{{titleId}}">{{{title}}}</h1>
+        <section class="article__content">{{{content}}}</section>
+        {{{backlinks}}}
+      </article>
 
-    <div class="disqus" id="disqus_thread"></div>
+      <div
+        class="disqus"
+        id="disqus_thread"
+        data-url="{{{canonicalUrl}}}"
+      ></div>
+    </main>
+
+    <aside class="garden_layout__aside">{{{tree}}} {{{toc}}}</aside>
+
+    <footer class="footer garden_layout__footer">
+      <ul class="contacts">
+        <li class="contacts__item">
+          <a class="contacts__link" href="/">Home</a>
+        </li>
+        <li class="contacts__item">
+          <a class="contacts__link" href="/posts/">Blog</a>
+        </li>
+        <li class="contacts__item">Garden</li>
+        {{{links}}}
+      </ul>
+    </footer>
+
     <script>
       var disqus_config = function () {
         this.page.url = "{{{canonicalUrl}}}";
@@ -29,18 +52,6 @@
         (d.head || d.body).appendChild(s);
       })();
     </script>
-
-    <footer class="footer">
-      <ul class="contacts">
-        <li class="contacts__item">
-          <a class="contacts__link" href="/">Home</a>
-        </li>
-        <li class="contacts__item">
-          <a class="contacts__link" href="/posts/">Blog</a>
-        </li>
-        {{{links}}}
-      </ul>
-    </footer>
 
     {{{ym}}}
   </body>

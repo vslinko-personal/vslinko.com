@@ -322,13 +322,13 @@ a.post__link:focus {
 
 .article__header {
   font-weight: 300;
-  margin: 20px 20px 80px 20px;
+  margin: 20px 20px 40px 20px;
   line-height: 1.2;
   color: var(--headings-color);
 }
 
 .article__footer {
-  margin: 80px 20px 80px 20px;
+  margin: 60px 20px 80px 20px;
   line-height: 1.5;
 }
 
@@ -342,7 +342,7 @@ a.article__author:focus {
 }
 
 .disqus {
-  margin: 60px 20px;
+  margin: 80px 20px 20px 20px;
   max-width: 800px;
 }
 
@@ -366,5 +366,134 @@ a.backlinks__backlink {
 
 a.backlinks__backlink:hover,
 a.backlinks__backlink:focus {
+  color: var(--link-color-active);
+}
+
+.garden_layout {
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  grid-template-rows: auto auto;
+  grid-template-areas: "main aside" "footer footer";
+}
+
+@media (max-width: 1400px) {
+  .garden_layout {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+@media (max-width: 900px) {
+  .garden_layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "main" "aside" "footer";
+  }
+}
+
+.garden_layout__main {
+  grid-area: main;
+}
+
+.garden_layout__aside {
+  grid-area: aside;
+}
+
+.garden_layout__footer {
+  grid-area: footer;
+}
+
+.garden_nav {
+  margin: 40px;
+}
+
+@media (max-width: 900px) {
+  .garden_nav {
+    margin: 40px 20px;
+  }
+}
+
+.garden_nav__header {
+  font-size: 120%;
+}
+
+.garden_nav__folder {
+  margin: 0;
+}
+
+.garden_nav__list {
+  margin: 0;
+  padding: 0;
+}
+
+.garden_nav__item {
+  list-style: none;
+  margin: 5px 0;
+}
+
+.garden_nav__folder .garden_nav__list {
+  margin-left: 20px;
+}
+
+.garden_nav__folder_name {
+  margin: 5px 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.garden_nav__link {
+  color: var(--link-color);
+}
+
+.garden_nav__link:hover,
+.garden_nav__link:focus {
+  color: var(--link-color-active);
+}
+
+.toc {
+  margin: 40px;
+}
+
+@media (max-width: 900px) {
+  .toc {
+    margin: 40px 20px;
+  }
+}
+
+.toc__header {
+  font-size: 120%;
+}
+
+.toc__list {
+  margin: 0;
+  padding: 0;
+}
+
+.toc__item {
+  list-style: none;
+  margin: 10px 0;
+}
+
+.toc__depth-2 {
+  padding-left: 15px;
+}
+.toc__depth-3 {
+  padding-left: 30px;
+}
+.toc__depth-4 {
+  padding-left: 45px;
+}
+.toc__depth-5 {
+  padding-left: 60px;
+}
+.toc__depth-6 {
+  padding-left: 75px;
+}
+
+.toc__link {
+  color: var(--link-color);
+}
+
+.toc__link:hover,
+.toc__link:focus {
   color: var(--link-color-active);
 }

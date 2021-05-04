@@ -18,6 +18,7 @@ const glob = promisify(require("glob"));
 const unified = require("unified");
 const markdown = require("remark-parse");
 const remark2rehype = require("remark-rehype");
+const slug = require("remark-slug");
 const format = require("rehype-format");
 const html = require("rehype-stringify");
 const footnotes = require("remark-footnotes");
@@ -100,10 +101,14 @@ async function processPost({ post, templates }) {
   await writeFile(post.dist, result);
 }
 
-async function parseGardenMeta({ link, src }) {
+async function parseGardenMeta({ src }) {
   const title = path.basename(src, ".md");
+  const link = "/garden" + formatGardenUrl("/" + src);
 
-  const fileContent = await readFile(src, "utf-8");
+  const fileContent = await readFile(
+    path.join(process.env.GARDEN_ROOT, src),
+    "utf-8"
+  );
   const { meta, content } = parseMeta(fileContent);
 
   const tags = Array.from(
@@ -120,9 +125,15 @@ async function parseGardenMeta({ link, src }) {
 
   const isPublic = tags.includes("public") || fileContent.includes("#public");
 
+  const dirs = path
+    .dirname(src)
+    .split("/")
+    .filter((x) => x !== ".");
+
   return {
     link,
     title,
+    dirs,
     meta,
     tags,
     isPublic,
@@ -132,10 +143,24 @@ async function parseGardenMeta({ link, src }) {
 
 async function parseGardenFile(file, { permalinks }) {
   let title = file.title;
+  let titleId = "";
   const links = [];
+  let fileToc = [];
 
   const res = await unified()
     .use(markdown)
+    .use(slug)
+    .use(() => (root) => {
+      for (const child of root.children) {
+        if (child.type === "heading") {
+          fileToc.push({
+            title: typograf.execute(mdastToString(child)),
+            id: child.data.id,
+            depth: child.depth,
+          });
+        }
+      }
+    })
     .use(() => (root) => {
       const titleNode = root.children.find(
         (n) => n.type === "heading" && n.depth === 1
@@ -146,6 +171,7 @@ async function parseGardenFile(file, { permalinks }) {
       }
 
       title = typograf.execute(mdastToString(titleNode));
+      titleId = titleNode.data.id;
       root.children.splice(root.children.indexOf(titleNode), 1);
     })
     .use(wikiLinkPlugin, {
@@ -176,14 +202,16 @@ async function parseGardenFile(file, { permalinks }) {
   return {
     ...file,
     title,
+    titleId,
     content: res.contents,
     links,
+    toc: fileToc,
   };
 }
 
 async function saveGardenFile(
-  { link, meta, title, content },
-  { templates, backlinks }
+  { link, meta, title, titleId, content, toc },
+  { templates, tree, backlinks }
 ) {
   const dist = path.join("dist", link);
 
@@ -191,10 +219,13 @@ async function saveGardenFile(
     render(templates.garden, {
       lang: meta.lang || "ru",
       title,
+      titleId,
       summary: meta.summary || "",
       content,
       canonicalUrl: "https://vslinko.com" + link,
       backlinks: backlinks ? render(templates.backlinks, { backlinks }) : "",
+      tree: render(templates.tree, tree),
+      toc: render(templates.toc, { toc }),
       ym: templates.ym,
       links: templates.links,
     })
@@ -273,10 +304,8 @@ function formatGardenUrl(filePath) {
 }
 
 async function buildGarden({ templates }) {
-  const gardenSrcRoot = process.env.GARDEN_ROOT;
-
   const gardenFiles = await glob("**/*.md", {
-    cwd: gardenSrcRoot,
+    cwd: process.env.GARDEN_ROOT,
   });
 
   const gardenPermalinks = new Map();
@@ -284,8 +313,7 @@ async function buildGarden({ templates }) {
 
   for (const file of gardenFiles) {
     const parsed = await parseGardenMeta({
-      link: "/garden" + formatGardenUrl("/" + file),
-      src: gardenSrcRoot + "/" + file,
+      src: file,
     });
 
     if (!parsed.isPublic) {
@@ -294,6 +322,23 @@ async function buildGarden({ templates }) {
 
     gardenPermalinks.set(parsed.title, parsed.link);
     publicGardenFiles.push(parsed);
+  }
+
+  const tree = { folders: [], files: [] };
+  for (const file of publicGardenFiles) {
+    let current = tree;
+    for (const dir of file.dirs) {
+      let next = current.folders.find((f) => f.name === dir);
+      if (!next) {
+        next = { name: dir, folders: [], files: [] };
+        current.folders.push(next);
+      }
+      current = next;
+    }
+    current.files.push({
+      link: file.link,
+      title: file.title,
+    });
   }
 
   const backlinks = new Map();
@@ -318,6 +363,7 @@ async function buildGarden({ templates }) {
   for (const file of parsedGardenFiles) {
     await saveGardenFile(file, {
       templates,
+      tree,
       backlinks: backlinks.get(file.link),
     });
   }
@@ -329,6 +375,8 @@ async function buildCommand() {
   const templates = {
     garden: await readFile("src/templates/garden.html", "utf-8"),
     backlinks: await readFile("src/templates/backlinks.html", "utf-8"),
+    toc: await readFile("src/templates/toc.html", "utf-8"),
+    tree: await readFile("src/templates/tree.html", "utf-8"),
     post: await readFile("src/templates/post.html", "utf-8"),
     links: await readFile("src/templates/links.html", "utf-8"),
     ym: await readFile("src/templates/ym.html", "utf-8"),
@@ -338,6 +386,7 @@ async function buildCommand() {
 
   await mkdir("dist");
   await mkdir("dist/css");
+  await mkdir("dist/js");
   await mkdir("dist/posts");
   await mkdir("dist/resume");
   await mkdir("dist/media");
@@ -351,6 +400,7 @@ async function buildCommand() {
   await copy("css/a11y-dark.min.css");
   await copy("css/a11y-light.min.css");
   await processCSS("css/screen.css");
+  await copy("js/main.js");
   await copy("resume/developer.html");
   await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.webp");
   await processHTML("resume/manager.html", {

@@ -17,11 +17,10 @@
         {{{backlinks}}}
       </article>
 
-      <div
-        class="disqus"
-        id="disqus_thread"
-        data-url="{{{canonicalUrl}}}"
-      ></div>
+      <iframe
+        src="/comments-iframe.html?page-id={{{canonicalUrl}}}"
+        class="comments_iframe"
+      ></iframe>
     </main>
 
     <aside class="garden_layout__aside">{{{tree}}} {{{toc}}}</aside>
@@ -38,20 +37,6 @@
         {{{links}}}
       </ul>
     </footer>
-
-    <script>
-      var disqus_config = function () {
-        this.page.url = "{{{canonicalUrl}}}";
-      };
-      (function () {
-        // DON'T EDIT BELOW THIS LINE
-        var d = document,
-          s = d.createElement("script");
-        s.src = "https://vslinko-com.disqus.com/embed.js";
-        s.setAttribute("data-timestamp", +new Date());
-        (d.head || d.body).appendChild(s);
-      })();
-    </script>
 
     {{{ym}}}
   </body>

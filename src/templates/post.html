@@ -34,20 +34,10 @@
       </footer>
     </article>
 
-    <div class="disqus" id="disqus_thread"></div>
-    <script>
-      var disqus_config = function () {
-        this.page.url = "{{{canonicalUrl}}}";
-      };
-      (function () {
-        // DON'T EDIT BELOW THIS LINE
-        var d = document,
-          s = d.createElement("script");
-        s.src = "https://vslinko-com.disqus.com/embed.js";
-        s.setAttribute("data-timestamp", +new Date());
-        (d.head || d.body).appendChild(s);
-      })();
-    </script>
+    <iframe
+      src="/comments-iframe.html?page-id={{{canonicalUrl}}}"
+      class="comments_iframe"
+    ></iframe>
 
     <footer class="footer">
       <ul class="contacts">

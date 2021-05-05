@@ -406,6 +406,7 @@ async function buildCommand() {
   await processHTML("resume/manager.html", {
     ym: templates.ym,
   });
+  await processHTML("comments-iframe.html", {});
 
   const posts = await parsePosts();
 

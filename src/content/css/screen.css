@@ -341,9 +341,11 @@ a.article__author:focus {
   color: var(--link-color-active);
 }
 
-.disqus {
+.comments_iframe {
   margin: 80px 20px 20px 20px;
   max-width: 800px;
+  width: 100%;
+  border: 0;
 }
 
 .backlinks {

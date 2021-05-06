@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Viacheslav Slinko's Blog</title>
+  <link>https://vslinko.com/posts/</link>
+  <description>Personal blog of Viacheslav Slinko. I write about IT management, software development, personal development and anything else that interests me.</description>
+  <atom:link href="https://vslinko.com/posts/rss.xml" rel="self" type="application/rss+xml" />
+
+  {% for post in posts %}
+  <item>
+    <title>{{ post.title|safe }}</title>
+    <link>{{ post.fullUrl }}</link>
+    <guid isPermaLink="true">{{ post.fullUrl }}</guid>
+    <description><![CDATA[ {{ post.summary|safe }} ]]></description>
+    <pubDate>{{ post.pubDate }}</pubDate>
+  </item>
+  {% endfor %}
+</channel>
+</rss>

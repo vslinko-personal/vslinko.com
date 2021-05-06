@@ -107,6 +107,12 @@ async function processSitemap({ urls }) {
   await writeFile("dist/sitemap.xml", result);
 }
 
+async function processRss({ posts }) {
+  const result = nunjucks.render("rss.xml", { posts });
+
+  await writeFile("dist/posts/rss.xml", result);
+}
+
 async function parseGardenMeta({ src }) {
   const title = path.basename(src, ".md");
   const link = "/garden" + formatGardenUrl("/" + src);
@@ -267,9 +273,6 @@ async function saveGardenFile(
   await writeFile(dist, result);
 }
 
-// https://stevemorse.org/russian/rus2eng.html
-// https://markdowntohtml.com/
-
 function parseMeta(content) {
   let meta = {};
   const rows = content.split("\n");
@@ -325,8 +328,10 @@ async function parsePosts() {
         dist,
         mtime,
         url: `/posts/${date}-${slug}.html`,
+        fullUrl: `https://vslinko.com/posts/${date}-${slug}.html`,
         canonicalUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
         date,
+        pubDate: new Date(date).toGMTString(),
         content: res.content,
         meta,
       });
@@ -471,6 +476,10 @@ export async function buildCommand() {
   }
 
   await processPosts({ posts });
+
+  await processRss({
+    posts,
+  });
 
   await processHTML("index.html");
 

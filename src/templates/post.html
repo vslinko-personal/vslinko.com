@@ -7,6 +7,12 @@
 {% block description %}{{ post.summary|safe }}{% endblock %}
 
 {% block headbottom %}
+<link
+  rel="alternate"
+  type="application/rss+xml" 
+  title="RSS feed for Viacheslav Slinko's Blog" 
+  href="/posts/rss.xml"
+/>
 {% if post.hasCodeBlocks %}
 <link
   rel="stylesheet"

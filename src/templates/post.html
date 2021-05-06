@@ -7,6 +7,7 @@
 {% block description %}{{ post.summary|safe }}{% endblock %}
 
 {% block headbottom %}
+<link rel="canonical" href="{{ post.canonicalUrl }}" />
 <link
   rel="alternate"
   type="application/rss+xml" 

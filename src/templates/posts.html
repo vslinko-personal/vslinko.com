@@ -35,7 +35,7 @@
       >{{ post.dateFormatted }}</time
     >
     <h2 class="post__title" itemprop="headline">
-      <a class="post__link" href="{{ post.url }}" itemprop="url">{{ post.title|safe }}</a>
+      <a class="post__link" href="{{ post.canonicalUrl }}" itemprop="url">{{ post.title|safe }}</a>
     </h2>
     <p class="post__summary" itemprop="articleBody">{{ post.summary|safe }}</p>
   </article>

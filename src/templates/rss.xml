@@ -9,8 +9,8 @@
   {% for post in posts %}
   <item>
     <title>{{ post.title|safe }}</title>
-    <link>{{ post.fullUrl }}</link>
-    <guid isPermaLink="true">{{ post.fullUrl }}</guid>
+    <link>{{ post.canonicalFullUrl }}</link>
+    <guid isPermaLink="true">{{ post.canonicalFullUrl }}</guid>
     <description><![CDATA[ {{ post.summary|safe }} ]]></description>
     <pubDate>{{ post.pubDate }}</pubDate>
   </item>

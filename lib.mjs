@@ -25,7 +25,7 @@ import footnotes from "remark-footnotes";
 import externalLinks from "remark-external-links";
 import highlight from "remark-highlight.js";
 import { toString as mdastToString } from "mdast-util-to-string";
-import visit from 'unist-util-visit';
+import visit from "unist-util-visit";
 import { wikiLinkPlugin } from "remark-wiki-link";
 import remarkTypograf from "@mavrin/remark-typograf";
 import slugify from "slugify";
@@ -93,6 +93,7 @@ async function processPost({ post }) {
   const result = minifyHTML(nunjucks.render("post.html", { post }));
 
   await writeFile(post.dist, result);
+  await writeFile(post.canonicalDist, result);
 }
 
 async function processPosts({ posts }) {
@@ -208,8 +209,8 @@ async function parseMarkdown({ content, permalinks }) {
     })
     .use(footnotes)
     .use(externalLinks, { rel: ["noopener"] })
-    .use(() => root => {
-      visit(root, 'code', (n) => {
+    .use(() => (root) => {
+      visit(root, "code", (n) => {
         hasCodeBlocks = true;
       });
     })
@@ -310,6 +311,13 @@ async function parsePosts() {
       const { meta, content } = parseMeta(fileContent);
       const { mtime } = await stat(src);
 
+      const canonicalDist = path.join(
+        "dist",
+        meta.lang,
+        "posts",
+        file.replace(/\.md$/, ".html")
+      );
+
       const res = await parseMarkdown({
         content: content,
       });
@@ -326,10 +334,12 @@ async function parsePosts() {
         lang: meta.lang || "",
         src,
         dist,
+        canonicalDist,
         mtime,
         url: `/posts/${date}-${slug}.html`,
         fullUrl: `https://vslinko.com/posts/${date}-${slug}.html`,
-        canonicalUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
+        canonicalUrl: `/${meta.lang}/posts/${date}-${slug}.html`,
+        canonicalFullUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
         date,
         pubDate: new Date(date).toGMTString(),
         content: res.content,
@@ -434,6 +444,10 @@ export async function buildCommand() {
   await mkdir("dist");
   await mkdir("dist/css");
   await mkdir("dist/js");
+  await mkdir("dist/ru");
+  await mkdir("dist/en");
+  await mkdir("dist/ru/posts");
+  await mkdir("dist/en/posts");
   await mkdir("dist/posts");
   await mkdir("dist/resume");
   await mkdir("dist/media");
@@ -485,7 +499,7 @@ export async function buildCommand() {
 
   const urls = posts.map((p) => {
     return {
-      loc: `https://vslinko.com${p.url}`,
+      loc: p.canonicalFullUrl,
       lastmod: p.mtime.toISOString(),
       changefreq: "monthly",
     };

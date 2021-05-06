@@ -1,56 +1,36 @@
-<!DOCTYPE html>
-<html
-  class="page"
-  lang="{{lang}}"
-  itemscope
-  itemtype="https://schema.org/BlogPosting"
->
-  <head>
-    <title>{{{title}}} — Blog — Viacheslav Slinko's website</title>
-    {{{meta}}}
-    <meta name="description" content="{{{summary}}}" />
-  </head>
-  <body class="page__body">
-    <article class="article">
-      <h1 class="article__header" itemprop="headline">{{{title}}}</h1>
-      <section class="article__content" itemprop="articleBody">
-        {{{content}}}
-      </section>
-      <footer class="article__footer">
-        <time itemprop="datePublished" datetime="{{date}}"
-          >{{dateFormatted}}</time
-        ><br />
-        <a
-          href="/"
-          class="article__author"
-          itemprop="author"
-          itemscope
-          itemtype="https://schema.org/Person"
-          ><span itemprop="name">Viacheslav Slinko</span></a
-        >
-      </footer>
-    </article>
+{% extends "base.html" %}
+{% from "links.html" import footer_links %}
 
-    <iframe
-      src="/comments-iframe.html?page-id={{{canonicalUrl}}}"
-      class="comments_iframe"
-    ></iframe>
+{% block lang %}{{ post.lang }}{% endblock %}
+{% block htmlattrs %}itemscope itemtype="https://schema.org/BlogPosting"{% endblock %}
+{% block title %}{{ post.title|safe }} — Blog — {{ super() }}{% endblock %}
+{% block description %}{{ post.summary|safe }}{% endblock %}
 
-    <footer class="footer">
-      <ul class="contacts">
-        <li class="contacts__item">
-          <a class="contacts__link" href="/">Home</a>
-        </li>
-        <li class="contacts__item">
-          <a class="contacts__link" href="/posts/">Blog</a>
-        </li>
-        <li class="contacts__item">
-          <a class="contacts__link" href="/garden/">Garden</a>
-        </li>
-        {{{links}}}
-      </ul>
-    </footer>
+{% block content %}
+<article class="article">
+  <h1 class="article__header" itemprop="headline">{{ post.title|safe }}</h1>
+  <section class="article__content" itemprop="articleBody">
+    {{ post.content|safe }}
+  </section>
+  <footer class="article__footer">
+    <time itemprop="datePublished" datetime="{{ post.date }}"
+      >{{ post.dateFormatted }}</time
+    ><br />
+    <a
+      href="/"
+      class="article__author"
+      itemprop="author"
+      itemscope
+      itemtype="https://schema.org/Person"
+      ><span itemprop="name">Viacheslav Slinko</span></a
+    >
+  </footer>
+</article>
 
-    {{{ym}}}
-  </body>
-</html>
+<iframe
+  src="/comments-iframe.html?page-id={{ post.canonicalUrl|safe }}"
+  class="comments_iframe"
+></iframe>
+
+<footer class="footer">{{ footer_links() }}</footer>
+{% endblock %}

@@ -1,40 +1,81 @@
-<!DOCTYPE html>
-<html class="page" lang="{{lang}}">
-  <head>
-    <title>{{{title}}} — Garden — Viacheslav Slinko's website</title>
-    {{{meta}}}
-    <meta name="description" content="{{{summary}}}" />
-    <script async src="/js/main.js"></script>
-  </head>
-  <body class="page__body garden_layout">
-    <main class="garden_layout__main">
-      <article class="article">
-        <h1 class="article__header" id="{{titleId}}">{{{title}}}</h1>
-        <section class="article__content">{{{content}}}</section>
-        {{{backlinks}}}
-      </article>
+{% extends "base.html" %}
+{% from "links.html" import footer_links %}
 
-      <iframe
-        src="/comments-iframe.html?page-id={{{canonicalUrl}}}"
-        class="comments_iframe"
-      ></iframe>
-    </main>
+{% block lang %}{{ lang }}{% endblock %}
+{% block title %}{{ title|safe }} — Garden — {{ super() }}{% endblock %}
+{% block description %}{{ summary|safe }}{% endblock %}
+{% block bodyclass %}garden_layout{% endblock %}
+{% block headbottom %}
+<script async src="/js/main.js"></script>
+{% endblock %}
 
-    <aside class="garden_layout__aside">{{{tree}}} {{{toc}}}</aside>
+{% block content %}
+<main class="garden_layout__main">
+  <article class="article">
+    <h1 class="article__header" id="{{ titleId }}">{{ title|safe }}</h1>
+    <section class="article__content">{{ content|safe }}</section>
 
-    <footer class="footer garden_layout__footer">
-      <ul class="contacts">
-        <li class="contacts__item">
-          <a class="contacts__link" href="/">Home</a>
+    {% if backlinks %}
+    <div class="backlinks">
+      <p>Links to this page</p>
+      <ul>
+        {% for backlink in backlinks %}
+        <li class="backlinks__item">
+          <a class="backlinks__backlink" href="{{ backlink.link }}"
+            >{{ backlink.title|safe }}</a
+          >
         </li>
-        <li class="contacts__item">
-          <a class="contacts__link" href="/posts/">Blog</a>
-        </li>
-        <li class="contacts__item">Garden</li>
-        {{{links}}}
+        {% endfor %}
       </ul>
-    </footer>
+    </div>
+    {% endif %}
+  </article>
 
-    {{{ym}}}
-  </body>
-</html>
+  <iframe
+    src="/comments-iframe.html?page-id={{ canonicalUrl|safe }}"
+    class="comments_iframe"
+  ></iframe>
+</main>
+
+<aside class="garden_layout__aside">
+  <nav class="garden_nav">
+    <p class="garden_nav__header">Navigation</p>
+    {% for folder in tree.folders %}
+    <details class="garden_nav__folder">
+      <summary class="garden_nav__folder_name">{{ folder.name }}</summary>
+      <ul class="garden_nav__list">
+        {% for file in folder.files %}
+        <li class="garden_nav__item">
+          <a class="garden_nav__link" href="{{ file.link }}"
+            >{{ file.title }}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endfor %}
+    <ul class="garden_nav__list">
+      {% for file in tree.files %}
+      <li class="garden_nav__item">
+        <a class="garden_nav__link" href="{{ file.link }}">{{ file.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <nav class="toc">
+    <p class="toc__header">Table of Contents</p>
+    <ul class="toc__list">
+      {% for title in toc %}
+      <li class="toc__item toc__depth-{{ title.depth }}">
+        <a class="toc__link" href="#{{ title.id }}">{{ title.title|safe }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</aside>
+
+<footer class="footer garden_layout__footer">
+  {{ footer_links("Garden") }}
+</footer>
+{% endblock %}

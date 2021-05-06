@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "links.html" import footer_links %}
+
+{% block lang %}en{% endblock %}
+{% block htmlattrs %}itemscope itemtype="https://schema.org/Blog"{% endblock %}
+{% block title %}Blog — {{ super() }}{% endblock %}
+{% block description_tag %}
+<meta
+  name="description"
+  itemprop="description"
+  content="Personal blog of Viacheslav Slinko. I write about IT management, software development, personal development and anything else that interests me."
+/>
+{% endblock %}
+
+{% block content %}
+<h1 class="header">Blog</h1>
+
+<main class="posts">
+  {% for post in posts %}
+  <article
+    class="post"
+    itemprop="blogPost"
+    itemscope
+    itemtype="https://schema.org/BlogPosting"
+  >
+    <time class="post__time" itemprop="datePublished" datetime="{{ post.date }}"
+      >{{ post.dateFormatted }}</time
+    >
+    <h2 class="post__title" itemprop="headline">
+      <a class="post__link" href="{{ post.url }}" itemprop="url">{{ post.title|safe }}</a>
+    </h2>
+    <p class="post__summary" itemprop="articleBody">{{ post.summary|safe }}</p>
+  </article>
+  {% endfor %}
+</main>
+
+<footer class="footer">{{ footer_links("Blog") }}</footer>
+{% endblock %}

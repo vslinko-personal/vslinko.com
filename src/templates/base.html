@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html class="page {% block htmlclass %}{% endblock %}" lang="{% block lang %}ru{% endblock %}" {% block htmlattrs %}{% endblock %}>
+  <head>
+    <title>{% block title %}Viacheslav Slinko's website{% endblock %}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#2d89ef" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/screen.css" />
+    {% block description_tag %}
+    <meta
+      name="description"
+      content="{% block description %}{% endblock %}"
+    />
+    {% endblock %}
+    {% block headbottom %}{% endblock %}
+  </head>
+  <body class="page__body {% block bodyclass %}{% endblock %}">
+    {% block content %}{% endblock %}
+
+    {% include "ym.html" %}
+  </body>
+</html>

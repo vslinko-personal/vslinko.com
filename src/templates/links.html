@@ -1,48 +1,67 @@
-<li class="contacts__item">
-  <a
-    class="contacts__link u-url"
-    href="https://t.me/vslinko"
-    target="blank"
-    rel="noopener"
-    >Telegram</a
-  >
-</li>
-<li class="contacts__item">
-  <a
-    class="contacts__link u-url"
-    href="http://facebook.com/vslinko"
-    target="blank"
-    rel="noopener"
-    >Facebook</a
-  >
-</li>
-<li class="contacts__item">
-  <a
-    class="contacts__link u-url"
-    href="https://ru.linkedin.com/in/vyacheslavslinko"
-    target="blank"
-    rel="noopener"
-    >LinkedIn</a
-  >
-</li>
-<li class="contacts__item">
-  <a
-    class="contacts__link u-url"
-    href="https://github.com/vslinko"
-    target="blank"
-    rel="noopener"
-    >Github</a
-  >
-</li>
-<li class="contacts__item">
-  <a
-    class="contacts__link u-url"
-    href="https://twitter.com/vslinko"
-    target="blank"
-    rel="noopener"
-    >Twitter</a
-  >
-</li>
-<li class="contacts__item">
-  <a class="contacts__link u-email" href="mailto:me@vslinko.com">Email</a>
-</li>
+{% macro footer_links(current_page) %}
+<ul class="contacts contacts-pos_center">
+  <li class="contacts__item">
+    {% if current_page == "Home" %}Home{% else %}
+    <a class="contacts__link" href="/">Home</a>
+    {% endif %}
+  </li>
+  <li class="contacts__item">
+    {% if current_page == "Blog" %}Blog{% else %}
+    <a class="contacts__link" href="/posts/">Blog</a>
+    {% endif %}
+  </li>
+  <li class="contacts__item">
+    {% if current_page == "Garden" %}Garden{% else %}
+    <a class="contacts__link" href="/garden/">Garden</a>
+    {% endif %}
+  </li>
+  <li class="contacts__item">
+    <a
+      class="contacts__link u-url"
+      href="https://t.me/vslinko"
+      target="blank"
+      rel="noopener"
+      >Telegram</a
+    >
+  </li>
+  <li class="contacts__item">
+    <a
+      class="contacts__link u-url"
+      href="http://facebook.com/vslinko"
+      target="blank"
+      rel="noopener"
+      >Facebook</a
+    >
+  </li>
+  <li class="contacts__item">
+    <a
+      class="contacts__link u-url"
+      href="https://ru.linkedin.com/in/vyacheslavslinko"
+      target="blank"
+      rel="noopener"
+      >LinkedIn</a
+    >
+  </li>
+  <li class="contacts__item">
+    <a
+      class="contacts__link u-url"
+      href="https://github.com/vslinko"
+      target="blank"
+      rel="noopener"
+      >Github</a
+    >
+  </li>
+  <li class="contacts__item">
+    <a
+      class="contacts__link u-url"
+      href="https://twitter.com/vslinko"
+      target="blank"
+      rel="noopener"
+      >Twitter</a
+    >
+  </li>
+  <li class="contacts__item">
+    <a class="contacts__link u-email" href="mailto:me@vslinko.com">Email</a>
+  </li>
+</ul>
+{% endmacro %}

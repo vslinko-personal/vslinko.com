@@ -13,7 +13,7 @@
     "glob": "^7.1.6",
     "html-minifier": "^4.0.0",
     "mdast-util-to-string": "^2.0.0",
-    "mustache": "^4.2.0",
+    "nunjucks": "^3.2.3",
     "rehype-format": "^3.1.0",
     "rehype-stringify": "^8.0.0",
     "remark-footnotes": "^3.0.0",

@@ -11,7 +11,7 @@ const { watch } = require("fs");
 const { promisify } = require("util");
 const path = require("path");
 const rimraf = promisify(require("rimraf"));
-const { render } = require("mustache");
+const nunjucks = require("nunjucks");
 const csso = require("csso");
 const htmlMinifier = require("html-minifier");
 const glob = promisify(require("glob"));
@@ -33,6 +33,8 @@ if (!process.env.GARDEN_ROOT) {
   console.error(`Unconfigured GARDEN_ROOT`);
   process.exit(1);
 }
+
+nunjucks.configure("./src/templates", { autoescape: true, noCache: true });
 
 const typograf = new Typograf({ locale: ["ru"] });
 
@@ -59,47 +61,42 @@ function minifyHTML(content) {
   });
 }
 
-async function processHTML(file, context) {
+async function processHTML(file) {
   const src = path.join("src", "content", file);
   const dist = path.join("dist", file);
 
   const template = await readFile(src, "utf-8");
-  const result = minifyHTML(render(template, context));
+  const result = minifyHTML(nunjucks.renderString(template));
 
   await writeFile(dist, result);
 }
 
-async function processXML(file, context) {
+async function processCSS(file) {
   const src = path.join("src", "content", file);
   const dist = path.join("dist", file);
 
   const template = await readFile(src, "utf-8");
-  const result = render(template, context);
+  const result = csso.minify(template).css;
 
   await writeFile(dist, result);
 }
 
-async function processCSS(file, context) {
-  const src = path.join("src", "content", file);
-  const dist = path.join("dist", file);
-
-  const template = await readFile(src, "utf-8");
-  const result = csso.minify(template, context).css;
-
-  await writeFile(dist, result);
-}
-
-async function processPost({ post, templates }) {
-  const result = minifyHTML(
-    render(templates.post, {
-      ...post,
-      ym: templates.ym,
-      links: templates.links,
-      meta: templates.meta,
-    })
-  );
+async function processPost({ post }) {
+  const result = minifyHTML(nunjucks.render("post.html", { post }));
 
   await writeFile(post.dist, result);
+}
+
+async function processPosts({ posts }) {
+  const result = minifyHTML(nunjucks.render("posts.html", { posts }));
+
+  await writeFile("dist/posts/index.html", result);
+}
+
+async function processSitemap({ urls }) {
+  const result = nunjucks.render("sitemap.xml", { urls });
+
+  await writeFile("dist/sitemap.xml", result);
 }
 
 async function parseGardenMeta({ src }) {
@@ -216,24 +213,21 @@ async function parseGardenFile(file, { permalinks }) {
 
 async function saveGardenFile(
   { link, meta, title, titleId, content, toc, canonicalUrl },
-  { templates, tree, backlinks }
+  { tree, backlinks }
 ) {
   const dist = path.join("dist", link);
 
   const result = minifyHTML(
-    render(templates.garden, {
+    nunjucks.render("garden.html", {
       lang: meta.lang || "ru",
       title,
       titleId,
       summary: meta.summary || "",
       content,
       canonicalUrl,
-      backlinks: backlinks ? render(templates.backlinks, { backlinks }) : "",
-      tree: render(templates.tree, tree),
-      toc: render(templates.toc, { toc }),
-      ym: templates.ym,
-      links: templates.links,
-      meta: templates.meta,
+      backlinks,
+      tree,
+      toc,
     })
   );
 
@@ -309,7 +303,7 @@ function formatGardenUrl(filePath) {
   return path.join(dir, slug + ".html");
 }
 
-async function buildGarden({ templates, urls }) {
+async function buildGarden({ urls }) {
   const gardenFiles = await glob("**/*.md", {
     cwd: process.env.GARDEN_ROOT,
   });
@@ -378,7 +372,6 @@ async function buildGarden({ templates, urls }) {
     });
 
     await saveGardenFile(file, {
-      templates,
       tree,
       backlinks: fileBacklinks,
     });
@@ -387,17 +380,6 @@ async function buildGarden({ templates, urls }) {
 
 async function buildCommand() {
   console.log("Building");
-
-  const templates = {
-    garden: await readFile("src/templates/garden.html", "utf-8"),
-    meta: await readFile("src/templates/meta.html", "utf-8"),
-    backlinks: await readFile("src/templates/backlinks.html", "utf-8"),
-    toc: await readFile("src/templates/toc.html", "utf-8"),
-    tree: await readFile("src/templates/tree.html", "utf-8"),
-    post: await readFile("src/templates/post.html", "utf-8"),
-    links: await readFile("src/templates/links.html", "utf-8"),
-    ym: await readFile("src/templates/ym.html", "utf-8"),
-  };
 
   await rimraf("dist");
 
@@ -436,29 +418,18 @@ async function buildCommand() {
   await copy("js/main.js");
   await copy("resume/developer.html");
   await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.webp");
-  await processHTML("resume/manager.html", {
-    ym: templates.ym,
-  });
-  await processHTML("comments-iframe.html", {});
+  await processHTML("resume/manager.html");
+  await processHTML("comments-iframe.html");
 
   const posts = await parsePosts();
 
   for (const post of posts) {
-    await processPost({ post, templates });
+    await processPost({ post });
   }
 
-  await processHTML("posts/index.html", {
-    posts,
-    ym: templates.ym,
-    links: templates.links,
-    meta: templates.meta,
-  });
+  await processPosts({ posts });
 
-  await processHTML("index.html", {
-    ym: templates.ym,
-    links: templates.links,
-    meta: templates.meta,
-  });
+  await processHTML("index.html");
 
   const urls = posts.map((p) => {
     return {
@@ -477,7 +448,7 @@ async function buildCommand() {
     }
     return acc;
   }, null);
-  const postsIndexLastmod = (await stat("src/content/posts/index.html")).mtime;
+  const postsIndexLastmod = (await stat("src/templates/posts.html")).mtime;
   const postsLastmod =
     postsIndexLastmod > maxPostLastmod ? postsIndexLastmod : maxPostLastmod;
 
@@ -504,11 +475,10 @@ async function buildCommand() {
   });
 
   await buildGarden({
-    templates,
     urls,
   });
 
-  await processXML("sitemap.xml", {
+  await processSitemap({
     urls,
   });
 }

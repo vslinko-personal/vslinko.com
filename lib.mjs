@@ -1,33 +1,41 @@
-require("dotenv").config();
-const {
+import dotenv from "dotenv";
+import {
   copyFile,
   mkdir,
   readFile,
   writeFile,
   readdir,
   stat,
-} = require("fs/promises");
-const { watch } = require("fs");
-const { promisify } = require("util");
-const path = require("path");
-const rimraf = promisify(require("rimraf"));
-const nunjucks = require("nunjucks");
-const csso = require("csso");
-const htmlMinifier = require("html-minifier");
-const glob = promisify(require("glob"));
-const unified = require("unified");
-const markdown = require("remark-parse");
-const remark2rehype = require("remark-rehype");
-const slug = require("remark-slug");
-const format = require("rehype-format");
-const html = require("rehype-stringify");
-const footnotes = require("remark-footnotes");
-const mdastToString = require("mdast-util-to-string");
-const { wikiLinkPlugin } = require("remark-wiki-link");
-const remarkTypograf = require("@mavrin/remark-typograf");
-const slugify = require("slugify");
-const YAML = require("yaml");
-const Typograf = require("typograf");
+} from "fs/promises";
+import { watch } from "fs";
+import { promisify } from "util";
+import path from "path";
+import _rimraf from "rimraf";
+import nunjucks from "nunjucks";
+import csso from "csso";
+import htmlMinifier from "html-minifier";
+import _glob from "glob";
+import unified from "unified";
+import markdown from "remark-parse";
+import remark2rehype from "remark-rehype";
+import slug from "remark-slug";
+import format from "rehype-format";
+import html from "rehype-stringify";
+import footnotes from "remark-footnotes";
+import externalLinks from "remark-external-links";
+import highlight from "remark-highlight.js";
+import { toString as mdastToString } from "mdast-util-to-string";
+import visit from 'unist-util-visit';
+import { wikiLinkPlugin } from "remark-wiki-link";
+import remarkTypograf from "@mavrin/remark-typograf";
+import slugify from "slugify";
+import YAML from "yaml";
+import Typograf from "typograf";
+
+const glob = promisify(_glob);
+const rimraf = promisify(_rimraf);
+
+dotenv.config();
 
 if (!process.env.GARDEN_ROOT) {
   console.error(`Unconfigured GARDEN_ROOT`);
@@ -143,11 +151,12 @@ async function parseGardenMeta({ src }) {
   };
 }
 
-async function parseGardenFile(file, { permalinks }) {
-  let title = file.title;
-  let titleId = "";
+async function parseMarkdown({ content, permalinks }) {
+  let title;
+  let titleId;
   const links = [];
-  let fileToc = [];
+  const toc = [];
+  let hasCodeBlocks = false;
 
   const res = await unified()
     .use(markdown)
@@ -155,7 +164,7 @@ async function parseGardenFile(file, { permalinks }) {
     .use(() => (root) => {
       for (const child of root.children) {
         if (child.type === "heading") {
-          fileToc.push({
+          toc.push({
             title: typograf.execute(mdastToString(child)),
             id: child.data.id,
             depth: child.depth,
@@ -178,7 +187,7 @@ async function parseGardenFile(file, { permalinks }) {
     })
     .use(wikiLinkPlugin, {
       pageResolver: (name) => {
-        if (!permalinks.has(name)) {
+        if (!permalinks || !permalinks.has(name)) {
           return [];
         }
 
@@ -192,6 +201,13 @@ async function parseGardenFile(file, { permalinks }) {
       aliasDivider: "||||||",
     })
     .use(footnotes)
+    .use(externalLinks, { rel: ["noopener"] })
+    .use(() => root => {
+      visit(root, 'code', (n) => {
+        hasCodeBlocks = true;
+      });
+    })
+    .use(highlight)
     .use(remarkTypograf, {
       typograf,
       builtIn: false,
@@ -199,15 +215,32 @@ async function parseGardenFile(file, { permalinks }) {
     .use(remark2rehype)
     .use(format)
     .use(html)
-    .process(file.content);
+    .process(content);
+
+  return {
+    title,
+    titleId,
+    links,
+    toc,
+    hasCodeBlocks,
+    content: res.contents,
+  };
+}
+
+async function parseGardenFile(file, { permalinks }) {
+  const res = await parseMarkdown({
+    content: file.content,
+    permalinks,
+  });
 
   return {
     ...file,
-    title,
-    titleId,
+    title: res.title || file.title,
+    titleId: res.titleId || "",
     content: res.contents,
-    links,
-    toc: fileToc,
+    links: res.links,
+    toc: res.toc,
+    content: res.content,
   };
 }
 
@@ -222,7 +255,7 @@ async function saveGardenFile(
       lang: meta.lang || "ru",
       title,
       titleId,
-      summary: meta.summary || "",
+      summary: typograf.execute(meta.summary || ""),
       content,
       canonicalUrl,
       backlinks,
@@ -261,31 +294,41 @@ function parseMeta(content) {
 async function parsePosts() {
   const posts = [];
 
-  const files = (await readdir("src/content/posts")).reverse();
+  const files = (await readdir("src/posts")).reverse();
 
   for (const file of files) {
-    const matches = /^(\d{4}-\d{2}-\d{2})-(.+)\.html$/.exec(file);
+    const matches = /^(\d{4}-\d{2}-\d{2})-(.+)\.md$/.exec(file);
 
     if (matches) {
-      const src = path.join("src", "content", "posts", file);
-      const dist = path.join("dist", "posts", file);
+      const src = path.join("src", "posts", file);
+      const dist = path.join("dist", "posts", file.replace(/\.md$/, ".html"));
 
       const fileContent = await readFile(src, "utf-8");
       const { meta, content } = parseMeta(fileContent);
       const { mtime } = await stat(src);
 
+      const res = await parseMarkdown({
+        content: content,
+      });
+
       const date = matches[1];
       const slug = matches[2];
 
       posts.push({
-        ...meta,
+        title: res.title || meta.title || "",
+        titleId: res.titleId || meta.titleId || "",
+        hasCodeBlocks: res.hasCodeBlocks,
+        summary: typograf.execute(meta.summary || ""),
+        dateFormatted: meta.dateFormatted || "",
+        lang: meta.lang || "",
         src,
         dist,
         mtime,
         url: `/posts/${date}-${slug}.html`,
         canonicalUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
         date,
-        content,
+        content: res.content,
+        meta,
       });
     }
   }
@@ -378,7 +421,7 @@ async function buildGarden({ urls }) {
   }
 }
 
-async function buildCommand() {
+export async function buildCommand() {
   console.log("Building");
 
   await rimraf("dist");
@@ -483,7 +526,7 @@ async function buildCommand() {
   });
 }
 
-async function watchCommand() {
+export async function watchCommand() {
   const watcher1 = watch("src", { recursive: true });
   const watcher2 = watch(process.env.GARDEN_ROOT, { recursive: true });
 
@@ -510,11 +553,4 @@ async function watchCommand() {
 
   watcher1.on("change", cb);
   watcher2.on("change", cb);
-}
-
-module.exports.build = buildCommand;
-module.exports.watch = watchCommand;
-
-if (require.main === module) {
-  buildCommand();
 }

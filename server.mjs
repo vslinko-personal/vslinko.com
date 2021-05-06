@@ -1,8 +1,8 @@
-const express = require("express");
-const { build, watch } = require("./build");
+import express from "express";
+import { buildCommand, watchCommand } from "./lib.mjs";
 
 async function main() {
-  await build();
+  await buildCommand();
 
   const app = express();
 
@@ -16,7 +16,7 @@ async function main() {
 
   app.listen(3000, "0.0.0.0", () => {
     console.log("Listening 0.0.0.0:3000");
-    watch();
+    watchCommand();
   });
 }
 

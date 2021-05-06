@@ -69,7 +69,7 @@ html {
 .page-type_mainpage .page__body {
   display: grid;
   height: 100%;
-  grid-template-rows: 1fr 100px;
+  grid-template-rows: 1fr 140px;
 }
 
 .bg {
@@ -344,7 +344,7 @@ a.article__author:focus {
 .comments_iframe {
   margin: 80px 20px 20px 20px;
   max-width: 800px;
-  width: 100%;
+  width: calc(100% - 40px);
   border: 0;
 }
 

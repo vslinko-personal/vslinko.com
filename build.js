@@ -104,12 +104,14 @@ async function processPost({ post, templates }) {
 async function parseGardenMeta({ src }) {
   const title = path.basename(src, ".md");
   const link = "/garden" + formatGardenUrl("/" + src);
+  const canonicalUrl = "https://vslinko.com" + link;
 
   const fileContent = await readFile(
     path.join(process.env.GARDEN_ROOT, src),
     "utf-8"
   );
   const { meta, content } = parseMeta(fileContent);
+  const { mtime } = await stat(path.join(process.env.GARDEN_ROOT, src));
 
   const tags = Array.from(
     (Array.isArray(meta.tags)
@@ -132,7 +134,9 @@ async function parseGardenMeta({ src }) {
 
   return {
     link,
+    canonicalUrl,
     title,
+    mtime,
     dirs,
     meta,
     tags,
@@ -210,7 +214,7 @@ async function parseGardenFile(file, { permalinks }) {
 }
 
 async function saveGardenFile(
-  { link, meta, title, titleId, content, toc },
+  { link, meta, title, titleId, content, toc, canonicalUrl },
   { templates, tree, backlinks }
 ) {
   const dist = path.join("dist", link);
@@ -222,7 +226,7 @@ async function saveGardenFile(
       titleId,
       summary: meta.summary || "",
       content,
-      canonicalUrl: "https://vslinko.com" + link,
+      canonicalUrl,
       backlinks: backlinks ? render(templates.backlinks, { backlinks }) : "",
       tree: render(templates.tree, tree),
       toc: render(templates.toc, { toc }),
@@ -303,7 +307,7 @@ function formatGardenUrl(filePath) {
   return path.join(dir, slug + ".html");
 }
 
-async function buildGarden({ templates }) {
+async function buildGarden({ templates, urls }) {
   const gardenFiles = await glob("**/*.md", {
     cwd: process.env.GARDEN_ROOT,
   });
@@ -361,10 +365,20 @@ async function buildGarden({ templates }) {
   }
 
   for (const file of parsedGardenFiles) {
+    const fileBacklinks = backlinks.get(file.link);
+
+    urls.push({
+      loc: file.canonicalUrl,
+      lastmod: new Date(
+        Math.max(file.mtime, ...(fileBacklinks || []).map((f) => f.mtime))
+      ).toISOString(),
+      changefreq: "weekly",
+    });
+
     await saveGardenFile(file, {
       templates,
       tree,
-      backlinks: backlinks.get(file.link),
+      backlinks: fileBacklinks,
     });
   }
 }
@@ -470,6 +484,7 @@ async function buildCommand() {
 
   await buildGarden({
     templates,
+    urls,
   });
 
   await processXML("sitemap.xml", {

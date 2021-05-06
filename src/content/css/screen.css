@@ -223,8 +223,13 @@ a.contacts__link:focus {
 
 .header {
   font-weight: 300;
-  margin: 20px 20px 80px 20px;
+  margin: 20px 20px 40px 20px;
+  line-height: 1.2;
   color: var(--headings-color);
+}
+
+.header-block {
+  margin-bottom: 20px;
 }
 
 .post {
@@ -260,6 +265,7 @@ a.post__link:focus {
   margin: 80px 0 0 0;
   padding: 20px;
   border-top: 1px solid var(--border-color);
+  box-sizing: border-box;
 }
 
 .article__content {
@@ -320,13 +326,6 @@ a.post__link:focus {
   color: var(--link-color-active);
 }
 
-.article__header {
-  font-weight: 300;
-  margin: 20px 20px 40px 20px;
-  line-height: 1.2;
-  color: var(--headings-color);
-}
-
 .article__footer {
   margin: 60px 20px 80px 20px;
   line-height: 1.5;
@@ -371,47 +370,46 @@ a.backlinks__backlink:focus {
   color: var(--link-color-active);
 }
 
-.garden_layout {
-  display: grid;
-  grid-template-columns: 1fr 500px;
-  grid-template-rows: auto auto;
-  grid-template-areas: "main aside" "footer footer";
+html {
+  --garden-layout-aside-width: 300px;
 }
 
-@media (max-width: 1400px) {
-  .garden_layout {
-    grid-template-columns: 1fr 300px;
+@media (min-width: 1200px) {
+  html {
+    --garden-layout-aside-width: 400px;
   }
 }
 
-@media (max-width: 900px) {
-  .garden_layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    grid-template-areas: "main" "aside" "footer";
+@media (min-width: 768px) {
+  .garden_layout__header {
+    width: calc(100% - var(--garden-layout-aside-width));
+    float: left;
   }
-}
 
-.garden_layout__main {
-  grid-area: main;
-}
+  .garden_layout__main {
+    width: calc(100% - var(--garden-layout-aside-width));
+    float: left;
+  }
 
-.garden_layout__aside {
-  grid-area: aside;
-}
+  .garden_layout__nav {
+    width: var(--garden-layout-aside-width);
+    float: right;
+  }
 
-.garden_layout__footer {
-  grid-area: footer;
+  .garden_layout__toc {
+    width: var(--garden-layout-aside-width);
+    float: right;
+  }
+
+  .garden_layout__footer {
+    width: 100%;
+    clear: both;
+  }
 }
 
 .garden_nav {
-  margin: 40px;
-}
-
-@media (max-width: 900px) {
-  .garden_nav {
-    margin: 40px 20px;
-  }
+  padding: 0 20px 20px 20px;
+  box-sizing: border-box;
 }
 
 .garden_nav__header {
@@ -452,13 +450,8 @@ a.backlinks__backlink:focus {
 }
 
 .toc {
-  margin: 40px;
-}
-
-@media (max-width: 900px) {
-  .toc {
-    margin: 40px 20px;
-  }
+  padding: 0 20px 20px 20px;
+  box-sizing: border-box;
 }
 
 .toc__header {

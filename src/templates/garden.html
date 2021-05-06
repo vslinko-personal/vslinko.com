@@ -2,6 +2,7 @@
 {% from "links.html" import footer_links %}
 
 {% block lang %}{{ lang }}{% endblock %}
+{% block htmlattrs %}itemscope itemtype="https://schema.org/Article"{% endblock %}
 {% block title %}{{ title|safe }} — Garden — {{ super() }}{% endblock %}
 {% block description %}{{ summary|safe }}{% endblock %}
 {% block bodyclass %}garden_layout{% endblock %}
@@ -10,26 +11,40 @@
 {% endblock %}
 
 {% block content %}
-<main class="garden_layout__main">
-  <article class="article">
-    <h1 class="article__header" id="{{ titleId }}">{{ title|safe }}</h1>
-    <section class="article__content">{{ content|safe }}</section>
+<header class="garden_layout__header">
+  <h1 class="header header-block" id="{{ titleId }}" itemprop="name">
+    {{ title|safe }}
+  </h1>
+</header>
 
-    {% if backlinks %}
-    <div class="backlinks">
-      <p>Links to this page</p>
-      <ul>
-        {% for backlink in backlinks %}
-        <li class="backlinks__item">
-          <a class="backlinks__backlink" href="{{ backlink.link }}"
-            >{{ backlink.title|safe }}</a
-          >
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-  </article>
+<nav class="toc garden_layout__toc">
+  <p class="toc__header">Table of Contents</p>
+  <ul class="toc__list">
+    {% for title in toc %}
+    <li class="toc__item toc__depth-{{ title.depth }}">
+      <a class="toc__link" href="#{{ title.id }}">{{ title.title|safe }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+
+<main class="article garden_layout__main">
+  <div class="article__content" itemprop="articleBody">{{ content|safe }}</div>
+
+  {% if backlinks %}
+  <div class="backlinks">
+    <p>Links to this page</p>
+    <ul>
+      {% for backlink in backlinks %}
+      <li class="backlinks__item">
+        <a class="backlinks__backlink" href="{{ backlink.link }}"
+          >{{ backlink.title|safe }}</a
+        >
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 
   <iframe
     src="/comments-iframe.html?page-id={{ canonicalUrl }}"
@@ -37,43 +52,28 @@
   ></iframe>
 </main>
 
-<aside class="garden_layout__aside">
-  <nav class="garden_nav">
-    <p class="garden_nav__header">Navigation</p>
-    {% for folder in tree.folders %}
-    <details class="garden_nav__folder">
-      <summary class="garden_nav__folder_name">{{ folder.name }}</summary>
-      <ul class="garden_nav__list">
-        {% for file in folder.files %}
-        <li class="garden_nav__item">
-          <a class="garden_nav__link" href="{{ file.link }}"
-            >{{ file.title }}</a
-          >
-        </li>
-        {% endfor %}
-      </ul>
-    </details>
-    {% endfor %}
+<nav class="garden_nav garden_layout__nav">
+  <p class="garden_nav__header">Navigation</p>
+  {% for folder in tree.folders %}
+  <details class="garden_nav__folder">
+    <summary class="garden_nav__folder_name">{{ folder.name }}</summary>
     <ul class="garden_nav__list">
-      {% for file in tree.files %}
+      {% for file in folder.files %}
       <li class="garden_nav__item">
         <a class="garden_nav__link" href="{{ file.link }}">{{ file.title }}</a>
       </li>
       {% endfor %}
     </ul>
-  </nav>
-
-  <nav class="toc">
-    <p class="toc__header">Table of Contents</p>
-    <ul class="toc__list">
-      {% for title in toc %}
-      <li class="toc__item toc__depth-{{ title.depth }}">
-        <a class="toc__link" href="#{{ title.id }}">{{ title.title|safe }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </nav>
-</aside>
+  </details>
+  {% endfor %}
+  <ul class="garden_nav__list">
+    {% for file in tree.files %}
+    <li class="garden_nav__item">
+      <a class="garden_nav__link" href="{{ file.link }}">{{ file.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
 
 <footer class="footer garden_layout__footer">
   {{ footer_links("Garden") }}

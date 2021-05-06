@@ -95,6 +95,7 @@ async function processPost({ post, templates }) {
       ...post,
       ym: templates.ym,
       links: templates.links,
+      meta: templates.meta,
     })
   );
 
@@ -232,6 +233,7 @@ async function saveGardenFile(
       toc: render(templates.toc, { toc }),
       ym: templates.ym,
       links: templates.links,
+      meta: templates.meta,
     })
   );
 
@@ -388,6 +390,7 @@ async function buildCommand() {
 
   const templates = {
     garden: await readFile("src/templates/garden.html", "utf-8"),
+    meta: await readFile("src/templates/meta.html", "utf-8"),
     backlinks: await readFile("src/templates/backlinks.html", "utf-8"),
     toc: await readFile("src/templates/toc.html", "utf-8"),
     tree: await readFile("src/templates/tree.html", "utf-8"),
@@ -410,6 +413,22 @@ async function buildCommand() {
 
   await copy("CNAME");
   await copy("robots.txt");
+
+  await copy("android-chrome-192x192.png");
+  await copy("android-chrome-512x512.png");
+  await copy("apple-touch-icon.png");
+  await copy("browserconfig.xml");
+  await copy("favicon-16x16.png");
+  await copy("favicon-32x32.png");
+  await copy("favicon.ico");
+  await copy("mstile-144x144.png");
+  await copy("mstile-150x150.png");
+  await copy("mstile-310x150.png");
+  await copy("mstile-310x310.png");
+  await copy("mstile-70x70.png");
+  await copy("safari-pinned-tab.svg");
+  await copy("site.webmanifest");
+
   await copy("css/normalize.css");
   await copy("css/a11y-dark.min.css");
   await copy("css/a11y-light.min.css");
@@ -432,11 +451,13 @@ async function buildCommand() {
     posts,
     ym: templates.ym,
     links: templates.links,
+    meta: templates.meta,
   });
 
   await processHTML("index.html", {
     ym: templates.ym,
     links: templates.links,
+    meta: templates.meta,
   });
 
   const urls = posts.map((p) => {

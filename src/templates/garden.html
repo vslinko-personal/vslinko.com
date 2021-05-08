@@ -31,23 +31,10 @@
 <main class="article garden_layout__main">
   <div class="article__content" itemprop="articleBody">{{ content|safe }}</div>
 
-  {% if backlinks %}
-  <div class="backlinks">
-    <p>Links to this page</p>
-    <ul>
-      {% for backlink in backlinks %}
-      <li class="backlinks__item">
-        <a class="backlinks__backlink" href="{{ backlink.link }}"
-          >{{ backlink.title|safe }}</a
-        >
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
+  {% include "backlinks.html" %}
 
   <iframe
-    src="/comments-iframe.html?page-id={{ canonicalUrl }}"
+    src="/comments-iframe.html?page-id={{ canonicalFullUrl }}"
     class="comments_iframe"
   ></iframe>
 </main>
@@ -60,7 +47,7 @@
     <ul class="garden_nav__list">
       {% for file in folder.files %}
       <li class="garden_nav__item">
-        <a class="garden_nav__link" href="{{ file.link }}">{{ file.title }}</a>
+        <a class="garden_nav__link" href="{{ file.url }}">{{ file.title }}</a>
       </li>
       {% endfor %}
     </ul>
@@ -69,7 +56,7 @@
   <ul class="garden_nav__list">
     {% for file in tree.files %}
     <li class="garden_nav__item">
-      <a class="garden_nav__link" href="{{ file.link }}">{{ file.title }}</a>
+      <a class="garden_nav__link" href="{{ file.url }}">{{ file.title }}</a>
     </li>
     {% endfor %}
   </ul>

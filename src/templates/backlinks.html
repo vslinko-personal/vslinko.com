@@ -1,0 +1,14 @@
+{% if backlinks %}
+<div class="backlinks">
+  <p>Links to this page</p>
+  <ul>
+    {% for backlink in backlinks %}
+    <li class="backlinks__item">
+      <a class="backlinks__backlink" href="{{ backlink.url }}"
+        >{{ backlink.title|safe }}</a
+      >
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

@@ -1,12 +1,5 @@
 import dotenv from "dotenv";
-import {
-  copyFile,
-  mkdir,
-  readFile,
-  writeFile,
-  readdir,
-  stat,
-} from "fs/promises";
+import { copyFile, mkdir, readFile, writeFile, stat } from "fs/promises";
 import { watch } from "fs";
 import { promisify } from "util";
 import path from "path";
@@ -42,6 +35,8 @@ if (!process.env.GARDEN_ROOT) {
   console.error(`Unconfigured GARDEN_ROOT`);
   process.exit(1);
 }
+
+const GARDEN_ROOT = process.env.GARDEN_ROOT;
 
 nunjucks.configure("./src/templates", { autoescape: true, noCache: true });
 
@@ -91,7 +86,9 @@ async function processCSS(file) {
 }
 
 async function processPost({ post }) {
-  const result = minifyHTML(nunjucks.render("post.html", { post }));
+  const result = minifyHTML(
+    nunjucks.render("post.html", { post, backlinks: post.backlinks })
+  );
 
   await writeFile(post.dist, result);
   await writeFile(post.canonicalDist, result);
@@ -116,17 +113,12 @@ async function processRss({ posts }) {
   await writeFile("dist/posts/rss.xml", result);
 }
 
-async function parseGardenMeta({ src }) {
+async function parseGardenFileMeta({ src }) {
   const title = path.basename(src, ".md");
-  const link = "/garden" + formatGardenUrl("/" + src);
-  const canonicalUrl = "https://vslinko.com" + link;
 
-  const fileContent = await readFile(
-    path.join(process.env.GARDEN_ROOT, src),
-    "utf-8"
-  );
+  const fileContent = await readFile(path.join(GARDEN_ROOT, src), "utf-8");
   const { meta, content } = parseMeta(fileContent);
-  const { mtime } = await stat(path.join(process.env.GARDEN_ROOT, src));
+  const { mtime } = await stat(path.join(GARDEN_ROOT, src));
 
   const tags = Array.from(
     (Array.isArray(meta.tags)
@@ -140,24 +132,37 @@ async function parseGardenMeta({ src }) {
     }, new Set())
   );
 
-  const isPublic = tags.includes("public") || fileContent.includes("#public");
-
   const dirs = path
     .dirname(src)
     .split("/")
     .filter((x) => x !== ".");
 
+  const slug =
+    meta.slug ||
+    slugify(path.basename(src, ".md"), {
+      lower: true,
+      locale: "ru",
+    });
+
+  const url = "/garden" + formatGardenFileUrl("/" + src, slug);
+  const fullUrl = "https://vslinko.com" + url;
+
   return {
-    link,
-    canonicalUrl,
+    url,
+    fullUrl,
+    canonicalUrl: url,
+    canonicalFullUrl: fullUrl,
     title,
     mtime,
     dirs,
     meta,
     tags,
-    isPublic,
     content,
     originalContent: fileContent,
+    collection: meta.collection || null,
+    slug,
+    lang: meta.lang || "ru",
+    summary: typograf.execute(meta.summary || ""),
   };
 }
 
@@ -167,6 +172,11 @@ async function parseMarkdown({ content, permalinks }) {
   const links = [];
   const toc = [];
   let hasCodeBlocks = false;
+
+  const cutIndex = content.indexOf("<!--hidden-->");
+  if (cutIndex >= 0) {
+    content = content.slice(0, cutIndex);
+  }
 
   const res = await unified()
     .use(markdown)
@@ -252,32 +262,23 @@ async function parseGardenFile(file, { permalinks }) {
     links: res.links,
     toc: res.toc,
     content: res.content,
+    hasCodeBlocks: res.hasCodeBlocks,
   };
 }
 
-async function saveGardenFile(
-  { link, meta, title, titleId, content, toc, canonicalUrl, originalContent },
-  { tree, backlinks }
-) {
-  const dist = path.join("dist", link);
-  const distMd = path.join("dist", link.replace(/\.html$/, ".md"));
+async function processGardenFile(file, { gardenTree }) {
+  const dist = path.join("dist", file.url);
+  const distMd = path.join("dist", file.url.replace(/\.html$/, ".md"));
 
   const result = minifyHTML(
     nunjucks.render("garden.html", {
-      lang: meta.lang || "ru",
-      title,
-      titleId,
-      summary: typograf.execute(meta.summary || ""),
-      content,
-      canonicalUrl,
-      backlinks,
-      tree,
-      toc,
+      ...file,
+      tree: gardenTree,
     })
   );
 
   await writeFile(dist, result);
-  await writeFile(distMd, originalContent);
+  await writeFile(distMd, file.originalContent);
 }
 
 function parseMeta(content) {
@@ -301,109 +302,57 @@ function parseMeta(content) {
   };
 }
 
-async function parsePosts() {
-  const posts = [];
+function parsePost(gardenFile) {
+  const date = gardenFile.meta.date;
+  const slug = gardenFile.slug;
+  const fileName = `${date}-${slug}.html`;
 
-  const files = (await readdir("src/posts")).reverse();
+  const dist = path.join("dist", "posts", fileName);
+  const canonicalDist = path.join("dist", gardenFile.lang, "posts", fileName);
 
-  for (const file of files) {
-    const matches = /^(\d{4}-\d{2}-\d{2})-(.+)\.md$/.exec(file);
-
-    if (matches) {
-      const src = path.join("src", "posts", file);
-      const dist = path.join("dist", "posts", file.replace(/\.md$/, ".html"));
-
-      const fileContent = await readFile(src, "utf-8");
-      const { meta, content } = parseMeta(fileContent);
-      const { mtime } = await stat(src);
-
-      const canonicalDist = path.join(
-        "dist",
-        meta.lang,
-        "posts",
-        file.replace(/\.md$/, ".html")
-      );
-
-      const res = await parseMarkdown({
-        content: content,
-      });
-
-      const date = matches[1];
-      const slug = matches[2];
-
-      posts.push({
-        title: res.title || meta.title || "",
-        titleId: res.titleId || meta.titleId || "",
-        hasCodeBlocks: res.hasCodeBlocks,
-        summary: typograf.execute(meta.summary || ""),
-        dateFormatted: meta.dateFormatted || "",
-        lang: meta.lang || "",
-        src,
-        dist,
-        canonicalDist,
-        originalContent: fileContent,
-        mtime,
-        url: `/posts/${date}-${slug}.html`,
-        fullUrl: `https://vslinko.com/posts/${date}-${slug}.html`,
-        canonicalUrl: `/${meta.lang}/posts/${date}-${slug}.html`,
-        canonicalFullUrl: `https://vslinko.com/${meta.lang}/posts/${date}-${slug}.html`,
-        date,
-        pubDate: new Date(date).toGMTString(),
-        content: res.content,
-        meta,
-      });
-    }
-  }
-
-  return posts;
+  return {
+    ...gardenFile,
+    dateFormatted: gardenFile.meta.dateFormatted || "",
+    dist,
+    canonicalDist,
+    url: `/posts/${fileName}`,
+    fullUrl: `https://vslinko.com/posts/${fileName}`,
+    canonicalUrl: `/${gardenFile.lang}/posts/${fileName}`,
+    canonicalFullUrl: `https://vslinko.com/${gardenFile.lang}/posts/${fileName}`,
+    date,
+    pubDate: new Date(date).toGMTString(),
+  };
 }
 
-function formatGardenUrl(filePath) {
+function formatGardenFileUrl(filePath, slug) {
   const dir = path.dirname(filePath).toLowerCase();
-  const slug = slugify(path.basename(filePath, ".md"), {
-    lower: true,
-    locale: "ru",
-  });
 
   return path.join(dir, slug + ".html");
 }
 
-async function buildGarden({ urls }) {
+async function parseGarden() {
   const gardenFiles = await glob("**/*.md", {
-    cwd: process.env.GARDEN_ROOT,
+    cwd: GARDEN_ROOT,
   });
 
   const gardenPermalinks = new Map();
   const publicGardenFiles = [];
 
   for (const file of gardenFiles) {
-    const parsed = await parseGardenMeta({
+    let parsed = await parseGardenFileMeta({
       src: file,
     });
 
-    if (!parsed.isPublic) {
+    if (!parsed.tags.includes("public")) {
       continue;
     }
 
-    gardenPermalinks.set(parsed.title, parsed.link);
-    publicGardenFiles.push(parsed);
-  }
-
-  const tree = { folders: [], files: [] };
-  for (const file of publicGardenFiles) {
-    let current = tree;
-    for (const dir of file.dirs) {
-      let next = current.folders.find((f) => f.name === dir);
-      if (!next) {
-        next = { name: dir, folders: [], files: [] };
-        current.folders.push(next);
-      }
-      current = next;
+    if (parsed.collection === "posts") {
+      parsed = parsePost(parsed);
     }
-    current.files.push({
-      link: file.link,
-      title: file.title,
-    });
+
+    gardenPermalinks.set(parsed.title, parsed.canonicalUrl);
+    publicGardenFiles.push(parsed);
   }
 
   const backlinks = new Map();
@@ -426,21 +375,34 @@ async function buildGarden({ urls }) {
   }
 
   for (const file of parsedGardenFiles) {
-    const fileBacklinks = backlinks.get(file.link);
+    const fileBacklinks = backlinks.get(file.url);
+    file.backlinks = fileBacklinks;
+    file.lastmod = new Date(
+      Math.max(file.mtime, ...(fileBacklinks || []).map((f) => f.mtime))
+    ).toISOString();
+  }
 
-    urls.push({
-      loc: file.canonicalUrl,
-      lastmod: new Date(
-        Math.max(file.mtime, ...(fileBacklinks || []).map((f) => f.mtime))
-      ).toISOString(),
-      changefreq: "weekly",
-    });
+  return parsedGardenFiles;
+}
 
-    await saveGardenFile(file, {
-      tree,
-      backlinks: fileBacklinks,
+function buildGardenTree(gardenFiles) {
+  const tree = { folders: [], files: [] };
+  for (const file of gardenFiles) {
+    let current = tree;
+    for (const dir of file.dirs) {
+      let next = current.folders.find((f) => f.name === dir);
+      if (!next) {
+        next = { name: dir, folders: [], files: [] };
+        current.folders.push(next);
+      }
+      current = next;
+    }
+    current.files.push({
+      url: file.url,
+      title: file.title,
     });
   }
+  return tree;
 }
 
 export async function buildCommand() {
@@ -490,10 +452,43 @@ export async function buildCommand() {
   await processHTML("resume/manager.html");
   await processHTML("comments-iframe.html");
 
-  const posts = await parsePosts();
+  const allGardenFiles = await parseGarden();
+
+  const { gardenFiles, posts } = allGardenFiles.reduce(
+    (acc, file) => {
+      if (file.collection === "posts") {
+        acc.posts.push(file);
+      } else {
+        acc.gardenFiles.push(file);
+      }
+      return acc;
+    },
+    { gardenFiles: [], posts: [] }
+  );
+
+  const gardenTree = buildGardenTree(gardenFiles);
+  const urls = [];
+
+  posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   for (const post of posts) {
+    urls.push({
+      loc: post.canonicalFullUrl,
+      lastmod: post.mtime.toISOString(),
+      changefreq: "monthly",
+    });
+
     await processPost({ post });
+  }
+
+  for (const file of gardenFiles) {
+    urls.push({
+      loc: file.canonicalFullUrl,
+      lastmod: file.lastmod,
+      changefreq: file.meta.changefreq || "monthly",
+    });
+
+    await processGardenFile(file, { gardenTree });
   }
 
   await processPosts({ posts });
@@ -503,14 +498,6 @@ export async function buildCommand() {
   });
 
   await processHTML("index.html");
-
-  const urls = posts.map((p) => {
-    return {
-      loc: p.canonicalFullUrl,
-      lastmod: p.mtime.toISOString(),
-      changefreq: "monthly",
-    };
-  });
 
   const maxPostLastmod = posts.reduce((acc, post) => {
     if (acc === null) {
@@ -547,10 +534,6 @@ export async function buildCommand() {
     changefreq: "monthly",
   });
 
-  await buildGarden({
-    urls,
-  });
-
   await processSitemap({
     urls,
   });
@@ -558,7 +541,7 @@ export async function buildCommand() {
 
 export async function watchCommand() {
   const watcher1 = watch("src", { recursive: true });
-  const watcher2 = watch(process.env.GARDEN_ROOT, { recursive: true });
+  const watcher2 = watch(GARDEN_ROOT, { recursive: true });
 
   let processing = false;
   let scheduled = false;

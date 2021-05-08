@@ -21,6 +21,7 @@ import remark2rehype from "remark-rehype";
 import slug from "remark-slug";
 import format from "rehype-format";
 import html from "rehype-stringify";
+import gfm from "remark-gfm";
 import footnotes from "remark-footnotes";
 import externalLinks from "remark-external-links";
 import highlight from "remark-highlight.js";
@@ -219,6 +220,7 @@ async function parseMarkdown({ content, permalinks }) {
       typograf,
       builtIn: false,
     })
+    .use(gfm)
     .use(remark2rehype)
     .use(format)
     .use(html)

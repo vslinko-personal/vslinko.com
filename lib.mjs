@@ -95,6 +95,7 @@ async function processPost({ post }) {
 
   await writeFile(post.dist, result);
   await writeFile(post.canonicalDist, result);
+  await writeFile(post.dist.replace(/\.html$/, ".md"), post.originalContent);
 }
 
 async function processPosts({ posts }) {
@@ -156,6 +157,7 @@ async function parseGardenMeta({ src }) {
     tags,
     isPublic,
     content,
+    originalContent: fileContent,
   };
 }
 
@@ -254,10 +256,11 @@ async function parseGardenFile(file, { permalinks }) {
 }
 
 async function saveGardenFile(
-  { link, meta, title, titleId, content, toc, canonicalUrl },
+  { link, meta, title, titleId, content, toc, canonicalUrl, originalContent },
   { tree, backlinks }
 ) {
   const dist = path.join("dist", link);
+  const distMd = path.join("dist", link.replace(/\.html$/, ".md"));
 
   const result = minifyHTML(
     nunjucks.render("garden.html", {
@@ -274,6 +277,7 @@ async function saveGardenFile(
   );
 
   await writeFile(dist, result);
+  await writeFile(distMd, originalContent);
 }
 
 function parseMeta(content) {
@@ -337,6 +341,7 @@ async function parsePosts() {
         src,
         dist,
         canonicalDist,
+        originalContent: fileContent,
         mtime,
         url: `/posts/${date}-${slug}.html`,
         fullUrl: `https://vslinko.com/posts/${date}-${slug}.html`,

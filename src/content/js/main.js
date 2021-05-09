@@ -1,9 +1,11 @@
 (function () {
   const selectorsToUpdate = [
-    "title",
-    ".garden_layout__header",
-    ".garden_layout__main",
-    ".garden_layout__toc",
+    ["title", "innerHTML"],
+    [".garden_layout__header", "innerHTML"],
+    [".garden_layout__main", "innerHTML"],
+    [".garden_layout__toc", "innerHTML"],
+    ["head link[rel=canonical]", "href"],
+    ["head meta[name=description]", "content"],
   ];
 
   let loadedPage = new URL(location);
@@ -13,10 +15,9 @@
     const data = await res.text();
     const doc = new DOMParser().parseFromString(data, "text/html");
 
-    for (const selector of selectorsToUpdate) {
-      document.querySelector(selector).innerHTML = doc.querySelector(
-        selector
-      ).innerHTML;
+    for (const [selector, prop] of selectorsToUpdate) {
+      const newValue = doc.querySelector(selector)[prop];
+      document.querySelector(selector)[prop] = newValue;
     }
 
     loadedPage = url;

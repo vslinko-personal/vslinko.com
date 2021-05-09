@@ -445,10 +445,15 @@ export async function buildCommand() {
 
   const contentFiles = await glob("**/*", {
     cwd: "src/content",
+    dot: true,
     nodir: true,
   });
 
   for (const file of contentFiles) {
+    if (file.includes(".DS_Store")) {
+      continue;
+    }
+
     const ext = path.extname(file);
     switch (ext) {
       case ".js":

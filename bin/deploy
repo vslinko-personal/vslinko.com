@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 npm run build
 
 if [ ! -d repo ]; then
@@ -9,8 +11,8 @@ fi
 cd repo
 git pull
 
-rm -rf *
-cp -r ../dist/* .
+rm -rf docs
+cp -r ../dist docs
 
 git add .
 git commit -m Update

@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
-import { copyFile, mkdir, readFile, writeFile, stat } from "fs/promises";
+import { copyFile, readFile, writeFile, stat } from "fs/promises";
 import { watch } from "fs";
 import { promisify } from "util";
+import mkdirp from "mkdirp";
 import path from "path";
 import _rimraf from "rimraf";
+import UglifyJS from "uglify-js";
 import nunjucks from "nunjucks";
 import csso from "csso";
 import htmlMinifier from "html-minifier";
@@ -46,6 +48,7 @@ async function copy(file) {
   const src = path.join("src", "content", file);
   const dist = path.join("dist", file);
 
+  await mkdirp(path.dirname(dist));
   await copyFile(src, dist);
 }
 
@@ -62,6 +65,12 @@ function minifyHTML(content) {
     useShortDoctype: true,
     sortAttributes: true,
     sortClassName: true,
+    minifyCSS: (text, type) => {
+      return csso.minify(text).css;
+    },
+    minifyJS: (text, inline) => {
+      return UglifyJS.minify(text).code;
+    },
   });
 }
 
@@ -72,6 +81,7 @@ async function processHTML(file) {
   const template = await readFile(src, "utf-8");
   const result = minifyHTML(nunjucks.renderString(template));
 
+  await mkdirp(path.dirname(dist));
   await writeFile(dist, result);
 }
 
@@ -82,6 +92,18 @@ async function processCSS(file) {
   const template = await readFile(src, "utf-8");
   const result = csso.minify(template).css;
 
+  await mkdirp(path.dirname(dist));
+  await writeFile(dist, result);
+}
+
+async function processJS(file) {
+  const src = path.join("src", "content", file);
+  const dist = path.join("dist", file);
+
+  const template = await readFile(src, "utf-8");
+  const result = UglifyJS.minify(template).code;
+
+  await mkdirp(path.dirname(dist));
   await writeFile(dist, result);
 }
 
@@ -90,26 +112,35 @@ async function processPost({ post }) {
     nunjucks.render("post.html", { post, backlinks: post.backlinks })
   );
 
+  await mkdirp(path.dirname(post.dist));
+  await mkdirp(path.dirname(post.canonicalDist));
   await writeFile(post.dist, result);
   await writeFile(post.canonicalDist, result);
   await writeFile(post.dist.replace(/\.html$/, ".md"), post.originalContent);
+  await writeFile(
+    post.canonicalDist.replace(/\.html$/, ".md"),
+    post.originalContent
+  );
 }
 
 async function processPosts({ posts }) {
   const result = minifyHTML(nunjucks.render("posts.html", { posts }));
 
+  await mkdirp("dist/posts");
   await writeFile("dist/posts/index.html", result);
 }
 
 async function processSitemap({ urls }) {
   const result = nunjucks.render("sitemap.xml", { urls });
 
+  await mkdirp("dist");
   await writeFile("dist/sitemap.xml", result);
 }
 
 async function processRss({ posts }) {
   const result = nunjucks.render("rss.xml", { posts });
 
+  await mkdirp("dist/posts");
   await writeFile("dist/posts/rss.xml", result);
 }
 
@@ -277,6 +308,7 @@ async function processGardenFile(file, { gardenTree }) {
     })
   );
 
+  await mkdirp(path.dirname(dist));
   await writeFile(dist, result);
   await writeFile(distMd, file.originalContent);
 }
@@ -333,6 +365,7 @@ function formatGardenFileUrl(filePath, slug) {
 async function parseGarden() {
   const gardenFiles = await glob("**/*.md", {
     cwd: GARDEN_ROOT,
+    nodir: true,
   });
 
   const gardenPermalinks = new Map();
@@ -410,47 +443,28 @@ export async function buildCommand() {
 
   await rimraf("dist");
 
-  await mkdir("dist");
-  await mkdir("dist/css");
-  await mkdir("dist/js");
-  await mkdir("dist/ru");
-  await mkdir("dist/en");
-  await mkdir("dist/ru/posts");
-  await mkdir("dist/en/posts");
-  await mkdir("dist/posts");
-  await mkdir("dist/resume");
-  await mkdir("dist/media");
-  await mkdir("dist/garden");
-  await mkdir("dist/garden/moc");
-  await mkdir("dist/garden/thoughts");
+  const contentFiles = await glob("**/*", {
+    cwd: "src/content",
+    nodir: true,
+  });
 
-  await copy("CNAME");
-  await copy("robots.txt");
-
-  await copy("android-chrome-192x192.png");
-  await copy("android-chrome-512x512.png");
-  await copy("apple-touch-icon.png");
-  await copy("browserconfig.xml");
-  await copy("favicon-16x16.png");
-  await copy("favicon-32x32.png");
-  await copy("favicon.ico");
-  await copy("mstile-144x144.png");
-  await copy("mstile-150x150.png");
-  await copy("mstile-310x150.png");
-  await copy("mstile-310x310.png");
-  await copy("mstile-70x70.png");
-  await copy("safari-pinned-tab.svg");
-  await copy("site.webmanifest");
-
-  await copy("css/normalize.css");
-  await copy("css/a11y-dark.min.css");
-  await copy("css/a11y-light.min.css");
-  await processCSS("css/screen.css");
-  await copy("js/main.js");
-  await copy("resume/developer.html");
-  await copy("media/john-fowler-7Ym9rpYtSdA-unsplash.webp");
-  await processHTML("resume/manager.html");
-  await processHTML("comments-iframe.html");
+  for (const file of contentFiles) {
+    const ext = path.extname(file);
+    switch (ext) {
+      case ".js":
+        await processJS(file);
+        break;
+      case ".css":
+        await processCSS(file);
+        break;
+      case ".html":
+        await processHTML(file);
+        break;
+      default:
+        await copy(file);
+        break;
+    }
+  }
 
   const allGardenFiles = await parseGarden();
 

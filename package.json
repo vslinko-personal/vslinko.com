@@ -13,6 +13,7 @@
     "glob": "^7.1.6",
     "html-minifier": "^4.0.0",
     "mdast-util-to-string": "^3.1.0",
+    "mkdirp": "^1.0.4",
     "nunjucks": "^3.2.3",
     "rehype-format": "^3.1.0",
     "rehype-stringify": "^8.0.0",
@@ -27,6 +28,7 @@
     "rimraf": "^3.0.2",
     "slugify": "^1.5.1",
     "typograf": "^6.11.3",
+    "uglify-js": "^3.13.5",
     "unified": "^9.2.1",
     "unist-util-visit": "^2.0.3",
     "yaml": "^1.10.2"

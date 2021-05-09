@@ -21,7 +21,7 @@ import footnotes from "remark-footnotes";
 import externalLinks from "remark-external-links";
 import highlight from "remark-highlight.js";
 import { toString as mdastToString } from "mdast-util-to-string";
-import visit from "unist-util-visit";
+import { visit } from "unist-util-visit";
 import { wikiLinkPlugin } from "remark-wiki-link";
 import remarkTypograf from "@mavrin/remark-typograf";
 import slugify from "slugify";

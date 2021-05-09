@@ -408,7 +408,7 @@ async function parseGarden() {
   }
 
   for (const file of parsedGardenFiles) {
-    const fileBacklinks = backlinks.get(file.url);
+    const fileBacklinks = backlinks.get(file.canonicalUrl);
     file.backlinks = fileBacklinks;
     file.lastmod = new Date(
       Math.max(file.mtime, ...(fileBacklinks || []).map((f) => f.mtime))

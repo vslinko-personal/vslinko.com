@@ -4,7 +4,7 @@
   <ul>
     {% for backlink in backlinks %}
     <li class="backlinks__item">
-      <a class="backlinks__backlink" href="{{ backlink.url }}"
+      <a class="backlinks__backlink" href="{{ backlink.canonicalUrl }}"
         >{{ backlink.title|safe }}</a
       >
     </li>

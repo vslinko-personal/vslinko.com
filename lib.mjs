@@ -177,12 +177,14 @@ async function parseGardenFileMeta({ src }) {
 
   const url = "/garden" + formatGardenFileUrl("/" + src, slug);
   const fullUrl = "https://vslinko.com" + url;
+  const canonicalUrl = url.replace(/\/index.html$/, "/");
+  const canonicalFullUrl = fullUrl.replace(/\/index.html$/, "/");
 
   return {
     url,
     fullUrl,
-    canonicalUrl: url,
-    canonicalFullUrl: fullUrl,
+    canonicalUrl,
+    canonicalFullUrl,
     title,
     mtime,
     dirs,
@@ -431,7 +433,7 @@ function buildGardenTree(gardenFiles) {
       current = next;
     }
     current.files.push({
-      url: file.url,
+      url: file.canonicalUrl,
       title: file.title,
     });
   }

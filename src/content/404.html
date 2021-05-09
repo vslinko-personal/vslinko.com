@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "links.html" import footer_links %}
+
+{% block lang %}en{% endblock %}
+{% block title %}404 — {{ super() }}{% endblock %}
+{% block description_tag %}{% endblock %}
+
+{% block content %}
+<h1 class="not_found">404 Not Found</h1>
+
+{{ footer_links() }}
+
+{% endblock %}

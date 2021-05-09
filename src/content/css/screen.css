@@ -221,6 +221,26 @@ a.contacts__link:focus {
   color: var(--link-color-mainpage-active);
 }
 
+.not_found {
+  font-weight: 600;
+  font-size: 200%;
+  margin: 15% auto 60px auto;
+  text-align: center;
+  color: var(--headings-color);
+}
+
+@media (min-width: 576px) {
+  .not_found {
+    font-size: 300%;
+  }
+}
+
+@media (min-width: 768px) {
+  .not_found {
+    font-size: 400%;
+  }
+}
+
 .header {
   font-weight: 300;
   margin: 20px 20px 40px 20px;

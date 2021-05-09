@@ -43,6 +43,11 @@
     await loadPage(url);
 
     history.pushState(null, document.querySelector("title").innerHTML, url);
+
+    gtag("event", "page_view", {
+      page_location: document.location.href,
+      page_title: document.title,
+    });
   });
 
   window.onpopstate = async () => {

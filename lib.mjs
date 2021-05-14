@@ -287,10 +287,13 @@ async function parseGardenFile(file, { permalinks }) {
     permalinks,
   });
 
+  const title = res.title || file.title;
+
   return {
     ...file,
-    title: res.title || file.title,
+    title,
     titleId: res.titleId || "",
+    summary: file.summary.length > 0 ? file.summary : title,
     content: res.contents,
     links: res.links,
     toc: res.toc,

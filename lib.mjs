@@ -254,6 +254,27 @@ async function parseMarkdown({ content, permalinks }) {
       aliasDivider: "||||||",
     })
     .use(footnotes)
+    .use(() => (root) => {
+      let index = 1;
+      const footnoteDefinitionIds = new Map();
+      visit(root, "footnoteDefinition", (n) => {
+        if (footnoteDefinitionIds.has(n.identifier)) {
+          n.identifier = footnoteDefinitionIds.get(n.identifier);
+          n.label = n.identifier;
+        } else {
+          const newId = String(index++);
+          footnoteDefinitionIds.set(n.identifier, newId);
+          n.identifier = newId;
+          n.label = n.identifier;
+        }
+      });
+      visit(root, "footnoteReference", (n) => {
+        if (footnoteDefinitionIds.has(n.identifier)) {
+          n.identifier = footnoteDefinitionIds.get(n.identifier);
+          n.label = n.identifier;
+        }
+      });
+    })
     .use(externalLinks, { rel: ["noopener"] })
     .use(() => (root) => {
       visit(root, "code", (n) => {
@@ -261,11 +282,11 @@ async function parseMarkdown({ content, permalinks }) {
       });
     })
     .use(highlight)
+    .use(gfm)
     .use(remarkTypograf, {
       typograf,
       builtIn: false,
     })
-    .use(gfm)
     .use(remark2rehype)
     .use(format)
     .use(html)

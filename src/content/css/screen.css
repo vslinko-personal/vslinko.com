@@ -311,6 +311,10 @@ a.post__link:focus {
   color: var(--headings-color);
 }
 
+.article__content sup {
+  margin-left: 2px;
+}
+
 .article__content li {
   margin: 5px 0;
   line-height: 1.5;

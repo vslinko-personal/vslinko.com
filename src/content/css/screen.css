@@ -304,6 +304,13 @@ a.post__link:focus {
   color: var(--headings-color);
 }
 
+.article__content h3 {
+  font-weight: 400;
+  margin: 20px 0 10px 0;
+  line-height: 1.2;
+  color: var(--headings-color);
+}
+
 .article__content li {
   margin: 5px 0;
   line-height: 1.5;

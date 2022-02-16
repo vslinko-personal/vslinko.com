@@ -408,6 +408,8 @@ async function parseGarden() {
 
     if (parsed.collection === "posts") {
       parsed = parsePost(parsed);
+    } else {
+      continue;
     }
 
     gardenPermalinks.set(parsed.title, parsed.canonicalUrl);

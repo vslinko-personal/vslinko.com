@@ -1,16 +1,15 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import { copyFile, readFile, writeFile, stat } from "fs/promises";
 import { watch } from "fs";
-import { promisify } from "util";
-import mkdirp from "mkdirp";
+import { mkdirp } from "mkdirp";
 import path from "path";
-import _rimraf from "rimraf";
+import { rimraf } from "rimraf";
 import UglifyJS from "uglify-js";
 import nunjucks from "nunjucks";
-import csso from "csso";
+import * as csso from "csso";
 import htmlMinifier from "html-minifier";
-import _glob from "glob";
-import unified from "unified";
+import { glob } from "glob";
+import { unified } from "unified";
 import markdown from "remark-parse";
 import remark2rehype from "remark-rehype";
 import slug from "remark-slug";
@@ -22,16 +21,11 @@ import externalLinks from "remark-external-links";
 import highlight from "remark-highlight.js";
 import { toString as mdastToString } from "mdast-util-to-string";
 import { visit } from "unist-util-visit";
-import { wikiLinkPlugin } from "remark-wiki-link";
+import wikiLinkPlugin from "remark-wiki-link";
 import remarkTypograf from "@mavrin/remark-typograf";
 import slugify from "slugify";
 import YAML from "yaml";
 import Typograf from "typograf";
-
-const glob = promisify(_glob);
-const rimraf = promisify(_rimraf);
-
-dotenv.config();
 
 if (!process.env.GARDEN_ROOT) {
   console.error(`Unconfigured GARDEN_ROOT`);
@@ -298,7 +292,7 @@ async function parseMarkdown({ content, permalinks }) {
     links,
     toc,
     hasCodeBlocks,
-    content: res.contents,
+    content: res.value,
   };
 }
 
